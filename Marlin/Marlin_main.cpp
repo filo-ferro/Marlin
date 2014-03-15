@@ -448,6 +448,10 @@ void setup()
   setup_killpin();
   setup_powerhold();
   MYSERIAL.begin(BAUDRATE);
+#ifdef USE_BT
+  BTSerial.begin(BAUDRATE);
+  BTSerial.write("Start BT");
+#endif
   SERIAL_PROTOCOLLNPGM("start");
   SERIAL_ECHO_START;
 
@@ -549,8 +553,33 @@ void loop()
   lcd_update();
 }
 
+int serial=-1;
+
 void get_command()
 {
+  #ifdef USE_BT
+  while( (MYSERIAL.available() || BTSerial.available()) > 0  && buflen < BUFSIZE) {
+    if ( serial == -1 ) {
+      if (MYSERIAL.available()) {
+        serial = 0;
+      } else if (BTSerial.available()) {
+        serial = 1;
+      }
+    }
+    if ( serial == 0 ) {
+      serial_char = MYSERIAL.read();
+    }
+    if ( serial == 1 ) {
+      serial_char = BTSerial.read();
+    }
+    if(serial_char == '\n' || 
+       serial_char == '\r' || 
+       (serial_char == ':' && comment_mode == false) || 
+       serial_count >= (MAX_CMD_SIZE - 1) ) 
+    {
+      serial = -1;
+  #else
+
   while( MYSERIAL.available() > 0  && buflen < BUFSIZE) {
     serial_char = MYSERIAL.read();
     if(serial_char == '\n' ||
@@ -558,6 +587,7 @@ void get_command()
        (serial_char == ':' && comment_mode == false) ||
        serial_count >= (MAX_CMD_SIZE - 1) )
     {
+  #endif
       if(!serial_count) { //if empty line
         comment_mode = false; //for new command
         return;
@@ -575,7 +605,6 @@ void get_command()
             SERIAL_ERROR_START;
             SERIAL_ERRORPGM(MSG_ERR_LINE_NO);
             SERIAL_ERRORLN(gcode_LastN);
-            //Serial.println(gcode_N);
             FlushSerialRequestResend();
             serial_count = 0;
             return;
@@ -2954,6 +2983,9 @@ void ClearToSend()
     return;
   #endif //SDSUPPORT
   SERIAL_PROTOCOLLNPGM(MSG_OK);
+  #ifdef USE_BT
+  BTSerial.write(MSG_OK);
+  #endif
 }
 
 void get_coordinates()

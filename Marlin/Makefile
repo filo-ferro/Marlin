@@ -247,6 +247,10 @@ SRC += twi.c
 CXXSRC += Wire.cpp LiquidTWI2.cpp
 endif
 
+ifeq ($(USE_BT),1)
+CXXSRC += MarlinBT.cpp
+endif
+
 #Check for Arduino 1.0.0 or higher and use the correct sourcefiles for that version
 ifeq ($(shell [ $(ARDUINO_VERSION) -ge 100 ] && echo true), true)
 CXXSRC += main.cpp
@@ -313,6 +317,9 @@ CTUNING += -DLANGUAGE_CHOICE=${LANGUAGE_CHOICE}
 endif
 ifneq ($(EXTRUDERS),)
 CTUNING += -DEXTRUDERS=${EXTRUDERS}
+endif
+ifneq ($(USE_BT),)
+CTUNING += -DUSE_BT=${USE_BT}
 endif
 #CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
 CEXTRA = -fno-use-cxa-atexit

@@ -40,6 +40,11 @@
 
 #include "MarlinSerial.h"
 
+//#define USE_BT
+#ifdef USE_BT
+#include "MarlinBT.h"
+#endif
+
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
