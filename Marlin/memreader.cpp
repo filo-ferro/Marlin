@@ -40,13 +40,13 @@ void MemReader::resumeMemPrint( void )
 void MemReader::getStatus()
 {
   if(isprinting){
-    SERIAL_PROTOCOLPGM(MSG_SD_PRINTING_BYTE);
-    SERIAL_PROTOCOL(pos);
-    SERIAL_PROTOCOLPGM("/");
-    SERIAL_PROTOCOLLN(ScriptLength[program]);
+    SERIAL_PROTOCOLPGM(MSG_SD_PRINTING_BYTE, 0);
+    SERIAL_PROTOCOL(pos, 0);
+    SERIAL_PROTOCOLPGM("/", 0);
+    SERIAL_PROTOCOLLN(ScriptLength[program], 0);
   }
   else{
-    SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING);
+    SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING, 0);
   }
 }
 

@@ -258,7 +258,7 @@ static long gcode_N, gcode_LastN, Stopped_gcode_LastN = 0;
 static bool relative_mode = false;  //Determines Absolute or Relative Coordinates
 
 static char cmdbuffer[BUFSIZE][MAX_CMD_SIZE];
-static bool fromsd[BUFSIZE];
+static int fromsd[BUFSIZE];
 static int bufindr = 0;
 static int bufindw = 0;
 static int buflen = 0;
@@ -300,12 +300,12 @@ bool target_direction;
 void get_arc_coordinates();
 bool setTargetedHotend(int code);
 
-void serial_echopair_P(const char *s_P, float v)
-    { serialprintPGM(s_P); SERIAL_ECHO(v); }
-void serial_echopair_P(const char *s_P, double v)
-    { serialprintPGM(s_P); SERIAL_ECHO(v); }
-void serial_echopair_P(const char *s_P, unsigned long v)
-    { serialprintPGM(s_P); SERIAL_ECHO(v); }
+void serial_echopair_P(const char *s_P, float v,int s)
+    { serialprintPGM(s_P,s); SERIAL_ECHO(v,s); }
+void serial_echopair_P(const char *s_P, double v,int s)
+    { serialprintPGM(s_P,s); SERIAL_ECHO(v,s); }
+void serial_echopair_P(const char *s_P, unsigned long v, int s)
+    { serialprintPGM(s_P,s); SERIAL_ECHO(v,s); }
 
 extern "C"{
   extern unsigned int __bss_end;
@@ -343,11 +343,11 @@ void enquecommand(const char *cmd)
   {
     //this is dangerous if a mixing of serial and this happsens
     strcpy(&(cmdbuffer[bufindw][0]),cmd);
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPGM("enqueing \"");
-    SERIAL_ECHO(cmdbuffer[bufindw]);
-    SERIAL_ECHOLNPGM("\"");
-    fromsd[bufindw] = true;
+    SERIAL0_ECHO_START;
+    SERIAL0_ECHOPGM("enqueing \"");
+    SERIAL0_ECHO(cmdbuffer[bufindw]);
+    SERIAL0_ECHOLNPGM("\"");
+    fromsd[bufindw] = -1;
     bufindw= (bufindw + 1)%BUFSIZE;
     buflen += 1;
   }
@@ -359,11 +359,11 @@ void enquecommand_P(const char *cmd)
   {
     //this is dangerous if a mixing of serial and this happsens
     strcpy_P(&(cmdbuffer[bufindw][0]),cmd);
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPGM("enqueing \"");
-    SERIAL_ECHO(cmdbuffer[bufindw]);
-    SERIAL_ECHOLNPGM("\"");
-    fromsd[bufindw] = true;
+    SERIAL0_ECHO_START;
+    SERIAL0_ECHOPGM("enqueing \"");
+    SERIAL0_ECHO(cmdbuffer[bufindw]);
+    SERIAL0_ECHOLNPGM("\"");
+    fromsd[bufindw] = -1;
     bufindw= (bufindw + 1)%BUFSIZE;
     buflen += 1;
   }
@@ -452,43 +452,43 @@ void setup()
   BTSerial.begin(BAUDRATE);
   BTSerial.write("Start BT");
 #endif
-  SERIAL_PROTOCOLLNPGM("start");
-  SERIAL_ECHO_START;
+  SERIAL0_PROTOCOLLNPGM("start");
+  SERIAL0_ECHO_START;
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
   byte mcu = MCUSR;
-  if(mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
-  if(mcu & 2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
-  if(mcu & 4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
-  if(mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
-  if(mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
+  if(mcu & 1) SERIAL0_ECHOLNPGM(MSG_POWERUP);
+  if(mcu & 2) SERIAL0_ECHOLNPGM(MSG_EXTERNAL_RESET);
+  if(mcu & 4) SERIAL0_ECHOLNPGM(MSG_BROWNOUT_RESET);
+  if(mcu & 8) SERIAL0_ECHOLNPGM(MSG_WATCHDOG_RESET);
+  if(mcu & 32) SERIAL0_ECHOLNPGM(MSG_SOFTWARE_RESET);
   MCUSR=0;
 
-  SERIAL_ECHOPGM(MSG_MARLIN);
-  SERIAL_ECHOLNPGM(VERSION_STRING);
+  SERIAL0_ECHOPGM(MSG_MARLIN);
+  SERIAL0_ECHOLNPGM(VERSION_STRING);
   #ifdef STRING_VERSION_CONFIG_H
     #ifdef STRING_CONFIG_H_AUTHOR
-      SERIAL_ECHO_START;
-      SERIAL_ECHOPGM(MSG_CONFIGURATION_VER);
-      SERIAL_ECHOPGM(STRING_VERSION_CONFIG_H);
-      SERIAL_ECHOPGM(MSG_AUTHOR);
-      SERIAL_ECHOLNPGM(STRING_CONFIG_H_AUTHOR);
-      SERIAL_ECHOPGM("Compiled: ");
-      SERIAL_ECHOLNPGM(__DATE__);
+      SERIAL0_ECHO_START;
+      SERIAL0_ECHOPGM(MSG_CONFIGURATION_VER);
+      SERIAL0_ECHOPGM(STRING_VERSION_CONFIG_H);
+      SERIAL0_ECHOPGM(MSG_AUTHOR);
+      SERIAL0_ECHOLNPGM(STRING_CONFIG_H_AUTHOR);
+      SERIAL0_ECHOPGM("Compiled: ");
+      SERIAL0_ECHOLNPGM(__DATE__);
     #endif
   #endif
-  SERIAL_ECHO_START;
-  SERIAL_ECHOPGM(MSG_FREE_MEMORY);
-  SERIAL_ECHO(freeMemory());
-  SERIAL_ECHOPGM(MSG_PLANNER_BUFFER_BYTES);
-  SERIAL_ECHOLN((int)sizeof(block_t)*BLOCK_BUFFER_SIZE);
+  SERIAL0_ECHO_START;
+  SERIAL0_ECHOPGM(MSG_FREE_MEMORY);
+  SERIAL0_ECHO(freeMemory());
+  SERIAL0_ECHOPGM(MSG_PLANNER_BUFFER_BYTES);
+  SERIAL0_ECHOLN((int)sizeof(block_t)*BLOCK_BUFFER_SIZE);
   for(int8_t i = 0; i < BUFSIZE; i++)
   {
-    fromsd[i] = false;
+    fromsd[i] = 0;
   }
 
   // loads data from EEPROM if available else uses defaults (and resets step acceleration rate)
-  Config_RetrieveSettings();
+  Config_RetrieveSettings( 0 );
 
   tp_init();    // Initialize temperature loop
   plan_init();  // Initialize planner;
@@ -527,13 +527,13 @@ void loop()
           }
           else
           {
-            SERIAL_PROTOCOLLNPGM(MSG_OK);
+            SERIAL_PROTOCOLLNPGM(MSG_OK, fromsd[bufindr]);
           }
         }
         else
         {
           card.closefile();
-          SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
+          SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED, fromsd[bufindr]);
         }
       }
       else
@@ -577,6 +577,11 @@ void get_command()
        (serial_char == ':' && comment_mode == false) || 
        serial_count >= (MAX_CMD_SIZE - 1) ) 
     {
+      if ( serial == 0 ) {
+         fromsd[bufindw] = 0;
+      } else {
+         fromsd[bufindw] = 1;
+      }
       serial = -1;
   #else
 
@@ -587,6 +592,7 @@ void get_command()
        (serial_char == ':' && comment_mode == false) ||
        serial_count >= (MAX_CMD_SIZE - 1) )
     {
+      fromsd[bufindw] = SERIAL;
   #endif
       if(!serial_count) { //if empty line
         comment_mode = false; //for new command
@@ -596,15 +602,14 @@ void get_command()
       //if(!comment_mode){
       {
         comment_mode = false; //for new command
-        fromsd[bufindw] = false;
         if(strchr(cmdbuffer[bufindw], 'N') != NULL)
         {
           strchr_pointer = strchr(cmdbuffer[bufindw], 'N');
           gcode_N = (strtol(&cmdbuffer[bufindw][strchr_pointer - cmdbuffer[bufindw] + 1], NULL, 10));
           if( (gcode_N != gcode_LastN+1) && ((strstr_P(cmdbuffer[bufindw], PSTR("M110")) == NULL)) && (cmdbuffer[bufindw][0] == 'N') ) {
-            SERIAL_ERROR_START;
-            SERIAL_ERRORPGM(MSG_ERR_LINE_NO);
-            SERIAL_ERRORLN(gcode_LastN);
+            SERIAL_ERROR_START( fromsd[bufindw] );
+            SERIAL_ERRORPGM(MSG_ERR_LINE_NO, fromsd[bufindw]);
+            SERIAL_ERRORLN(gcode_LastN, fromsd[bufindw]);
             FlushSerialRequestResend();
             serial_count = 0;
             return;
@@ -625,9 +630,9 @@ void get_command()
               strchr_pointer = strchr(cmdbuffer[bufindw], '*');
 
               if( (int)(strtod(&cmdbuffer[bufindw][strchr_pointer - cmdbuffer[bufindw] + 1], NULL)) != checksum) {
-                SERIAL_ERROR_START;
-                SERIAL_ERRORPGM(MSG_ERR_CHECKSUM_MISMATCH);
-                SERIAL_ERRORLN(gcode_LastN);
+                SERIAL_ERROR_START( fromsd[bufindw] );
+                SERIAL_ERRORPGM(MSG_ERR_CHECKSUM_MISMATCH, fromsd[bufindw]);
+                SERIAL_ERRORLN(gcode_LastN, fromsd[bufindw]);
                 FlushSerialRequestResend();
                 serial_count = 0;
                 return;
@@ -636,9 +641,9 @@ void get_command()
               //*strchr_pointer=0x00;
             }
             else {
-              SERIAL_ERROR_START;
-              SERIAL_ERRORPGM(MSG_ERR_NO_CHECKSUM);
-              SERIAL_ERRORLN(gcode_LastN);
+              SERIAL_ERROR_START( fromsd[bufindw] );
+              SERIAL_ERRORPGM(MSG_ERR_NO_CHECKSUM, fromsd[bufindw]);
+              SERIAL_ERRORLN(gcode_LastN, fromsd[bufindw]);
               FlushSerialRequestResend();
               serial_count = 0;
               return;
@@ -659,9 +664,9 @@ void get_command()
         {
           if((strchr(cmdbuffer[bufindw], '*') != NULL))
           {
-            SERIAL_ERROR_START;
-            SERIAL_ERRORPGM(MSG_ERR_NO_LINENUMBER_WITH_CHECKSUM);
-            SERIAL_ERRORLN(gcode_LastN);
+            SERIAL_ERROR_START( fromsd[bufindw] );
+            SERIAL_ERRORPGM(MSG_ERR_NO_LINENUMBER_WITH_CHECKSUM, fromsd[bufindw]);
+            SERIAL_ERRORLN(gcode_LastN, fromsd[bufindw]);
             serial_count = 0;
             return;
           }
@@ -680,10 +685,10 @@ void get_command()
               if(card.saving)
                 break;
           #endif //SDSUPPORT
-              SERIAL_PROTOCOLLNPGM(MSG_OK);
+              SERIAL_PROTOCOLLNPGM(MSG_OK, fromsd[bufindw]);
             }
             else {
-              SERIAL_ERRORLNPGM(MSG_ERR_STOPPED);
+              SERIAL_ERRORLNPGM(MSG_ERR_STOPPED, fromsd[bufindw]);
               LCD_MESSAGEPGM(MSG_STOPPED);
             }
             break;
@@ -732,7 +737,7 @@ void get_command()
           return; //if empty line
         }
         cmdbuffer[bufindw][serial_count] = 0; //terminate string
-        fromsd[bufindw] = true; // No serial response
+        fromsd[bufindw] = -1; // No serial response
         buflen += 1;
         bufindw = (bufindw + 1)%BUFSIZE;
         comment_mode = false;
@@ -775,7 +780,7 @@ void get_command()
        serial_count >= (MAX_CMD_SIZE - 1)||n==-1)
     {
       if(card.eof()){
-        SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
+        SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED, 0);
         stoptime=millis();
         char time[30];
         unsigned long t=(stoptime-starttime)/1000;
@@ -783,8 +788,8 @@ void get_command()
         minutes=(t/60)%60;
         hours=t/60/60;
         sprintf_P(time, PSTR("%i "MSG_HOURS" %i "MSG_MINUTES),hours, minutes);
-        SERIAL_ECHO_START;
-        SERIAL_ECHOLN(time);
+        SERIAL_ECHO_START( 0 );
+        SERIAL_ECHOLN(time, 0);
         lcd_setstatus(time);
         card.printingHasFinished();
         card.checkautostart(true);
@@ -800,7 +805,7 @@ void get_command()
       }
       cmdbuffer[bufindw][serial_count] = 0; //terminate string
 //      if(!comment_mode){
-        fromsd[bufindw] = true;
+        fromsd[bufindw] = -1;
         buflen += 1;
         bufindw = (bufindw + 1)%BUFSIZE;
 //      }
@@ -1560,9 +1565,9 @@ void process_commands()
 
 #ifdef SDSUPPORT
     case 20: // M20 - list SD card
-      SERIAL_PROTOCOLLNPGM(MSG_BEGIN_FILE_LIST);
+      SERIAL_PROTOCOLLNPGM(MSG_BEGIN_FILE_LIST, fromsd[bufindr]);
       card.ls();
-      SERIAL_PROTOCOLLNPGM(MSG_END_FILE_LIST);
+      SERIAL_PROTOCOLLNPGM(MSG_END_FILE_LIST, fromsd[bufindr]);
       break;
     case 21: // M21 - init SD card
 
@@ -1675,8 +1680,8 @@ void process_commands()
       min=t/60;
       sec=t%60;
       sprintf_P(time, PSTR("%i min, %i sec"), min, sec);
-      SERIAL_ECHO_START;
-      SERIAL_ECHOLN(time);
+      SERIAL_ECHO_START( fromsd[bufindr] );
+      SERIAL_ECHOLN(time, fromsd[bufindr]);
       lcd_setstatus(time);
       autotempShutdown();
       }
@@ -1773,53 +1778,53 @@ void process_commands()
         break;
       }
       #if defined(TEMP_0_PIN) && TEMP_0_PIN > -1
-        SERIAL_PROTOCOLPGM("ok T:");
-        SERIAL_PROTOCOL_F(degHotend(tmp_extruder),1);
-        SERIAL_PROTOCOLPGM(" /");
-        SERIAL_PROTOCOL_F(degTargetHotend(tmp_extruder),1);
+        SERIAL_PROTOCOLPGM("ok T:", fromsd[bufindr]);
+        SERIAL_PROTOCOL_F(degHotend(tmp_extruder),1, fromsd[bufindr]);
+        SERIAL_PROTOCOLPGM(" /", fromsd[bufindr]);
+        SERIAL_PROTOCOL_F(degTargetHotend(tmp_extruder),1, fromsd[bufindr]);
         #if defined(TEMP_BED_PIN) && TEMP_BED_PIN > -1
-          SERIAL_PROTOCOLPGM(" B:");
-          SERIAL_PROTOCOL_F(degBed(),1);
-          SERIAL_PROTOCOLPGM(" /");
-          SERIAL_PROTOCOL_F(degTargetBed(),1);
+          SERIAL_PROTOCOLPGM(" B:", fromsd[bufindr]);
+          SERIAL_PROTOCOL_F(degBed(),1, fromsd[bufindr]);
+          SERIAL_PROTOCOLPGM(" /", fromsd[bufindr]);
+          SERIAL_PROTOCOL_F(degTargetBed(),1, fromsd[bufindr]);
         #endif //TEMP_BED_PIN
         for (int8_t cur_extruder = 0; cur_extruder < EXTRUDERS; ++cur_extruder) {
-          SERIAL_PROTOCOLPGM(" T");
-          SERIAL_PROTOCOL(cur_extruder);
-          SERIAL_PROTOCOLPGM(":");
-          SERIAL_PROTOCOL_F(degHotend(cur_extruder),1);
-          SERIAL_PROTOCOLPGM(" /");
-          SERIAL_PROTOCOL_F(degTargetHotend(cur_extruder),1);
+          SERIAL_PROTOCOLPGM(" T", fromsd[bufindr]);
+          SERIAL_PROTOCOL(cur_extruder, fromsd[bufindr]);
+          SERIAL_PROTOCOLPGM(":", fromsd[bufindr]);
+          SERIAL_PROTOCOL_F(degHotend(cur_extruder),1, fromsd[bufindr]);
+          SERIAL_PROTOCOLPGM(" /", fromsd[bufindr]);
+          SERIAL_PROTOCOL_F(degTargetHotend(cur_extruder),1, fromsd[bufindr]);
         }
       #else
-        SERIAL_ERROR_START;
-        SERIAL_ERRORLNPGM(MSG_ERR_NO_THERMISTORS);
+        SERIAL_ERROR_START( fromsd[bufindr] );
+        SERIAL_ERRORLNPGM(MSG_ERR_NO_THERMISTORS, fromsd[bufindr]);
       #endif
 
-        SERIAL_PROTOCOLPGM(" @:");
-        SERIAL_PROTOCOL(getHeaterPower(tmp_extruder));
+        SERIAL_PROTOCOLPGM(" @:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(getHeaterPower(tmp_extruder), fromsd[bufindr]);
 
-        SERIAL_PROTOCOLPGM(" B@:");
-        SERIAL_PROTOCOL(getHeaterPower(-1));
+        SERIAL_PROTOCOLPGM(" B@:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(getHeaterPower(-1), fromsd[bufindr]);
 
         #ifdef SHOW_TEMP_ADC_VALUES
           #if defined(TEMP_BED_PIN) && TEMP_BED_PIN > -1
-            SERIAL_PROTOCOLPGM("    ADC B:");
-            SERIAL_PROTOCOL_F(degBed(),1);
-            SERIAL_PROTOCOLPGM("C->");
-            SERIAL_PROTOCOL_F(rawBedTemp()/OVERSAMPLENR,0);
+            SERIAL_PROTOCOLPGM("    ADC B:", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(degBed(),1, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM("C->", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(rawBedTemp()/OVERSAMPLENR,0,fromsd[bufindr]);
           #endif
           for (int8_t cur_extruder = 0; cur_extruder < EXTRUDERS; ++cur_extruder) {
-            SERIAL_PROTOCOLPGM("  T");
-            SERIAL_PROTOCOL(cur_extruder);
-            SERIAL_PROTOCOLPGM(":");
-            SERIAL_PROTOCOL_F(degHotend(cur_extruder),1);
-            SERIAL_PROTOCOLPGM("C->");
-            SERIAL_PROTOCOL_F(rawHotendTemp(cur_extruder)/OVERSAMPLENR,0);
+            SERIAL_PROTOCOLPGM("  T", fromsd[bufindr]);
+            SERIAL_PROTOCOL(cur_extruder, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM(":", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(degHotend(cur_extruder),1, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM("C->", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(rawHotendTemp(cur_extruder)/OVERSAMPLENR,0, fromsd[bufindr]);
           }
         #endif
 		
-        SERIAL_PROTOCOLLN("");
+        SERIAL_PROTOCOLLN("", fromsd[bufindr]);
       return;
       break;
     case 109:
@@ -1893,23 +1898,23 @@ void process_commands()
       #endif //TEMP_RESIDENCY_TIME
           if( (millis() - codenum) > 1000UL )
           { //Print Temp Reading and remaining time every 1 second while heating up/cooling down
-            SERIAL_PROTOCOLPGM("T:");
-            SERIAL_PROTOCOL_F(degHotend(tmp_extruder),1);
-            SERIAL_PROTOCOLPGM(" E:");
-            SERIAL_PROTOCOL((int)tmp_extruder);
+            SERIAL_PROTOCOLPGM("T:", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(degHotend(tmp_extruder),1, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM(" E:", fromsd[bufindr]);
+            SERIAL_PROTOCOL((int)tmp_extruder, fromsd[bufindr]);
             #ifdef TEMP_RESIDENCY_TIME
-              SERIAL_PROTOCOLPGM(" W:");
+              SERIAL_PROTOCOLPGM(" W:", fromsd[bufindr]);
               if(residencyStart > -1)
               {
                  codenum = ((TEMP_RESIDENCY_TIME * 1000UL) - (millis() - residencyStart)) / 1000UL;
-                 SERIAL_PROTOCOLLN( codenum );
+                 SERIAL_PROTOCOLLN( codenum, fromsd[bufindr] );
               }
               else
               {
-                 SERIAL_PROTOCOLLN( "?" );
+                 SERIAL_PROTOCOLLN( "?", fromsd[bufindr] );
               }
             #else
-              SERIAL_PROTOCOLLN("");
+              SERIAL_PROTOCOLLN("", fromsd[bufindr]);
             #endif
             codenum = millis();
           }
@@ -1959,13 +1964,13 @@ void process_commands()
           if(( millis() - codenum) > 1000 ) //Print Temp Reading every 1 second while heating up.
           {
             float tt=degHotend(active_extruder);
-            SERIAL_PROTOCOLPGM("T:");
-            SERIAL_PROTOCOL(tt);
-            SERIAL_PROTOCOLPGM(" E:");
-            SERIAL_PROTOCOL((int)active_extruder);
-            SERIAL_PROTOCOLPGM(" B:");
-            SERIAL_PROTOCOL_F(degBed(),1);
-            SERIAL_PROTOCOLLN("");
+            SERIAL_PROTOCOLPGM("T:", fromsd[bufindr]);
+            SERIAL_PROTOCOL(tt, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM(" E:", fromsd[bufindr]);
+            SERIAL_PROTOCOL((int)active_extruder, fromsd[bufindr]);
+            SERIAL_PROTOCOLPGM(" B:", fromsd[bufindr]);
+            SERIAL_PROTOCOL_F(degBed(),1, fromsd[bufindr]);
+            SERIAL_PROTOCOLLN("", fromsd[bufindr]);
             codenum = millis();
           }
           manage_heater();
@@ -2134,7 +2139,7 @@ void process_commands()
       }
       break;
     case 115: // M115
-      SERIAL_PROTOCOLPGM(MSG_M115_REPORT);
+      SERIAL_PROTOCOLPGM(MSG_M115_REPORT, fromsd[bufindr]);
       break;
     case 117: // M117 display message
       starpos = (strchr(strchr_pointer + 5,'*'));
@@ -2143,23 +2148,23 @@ void process_commands()
       lcd_setstatus(strchr_pointer + 5);
       break;
     case 114: // M114
-      SERIAL_PROTOCOLPGM("X:");
-      SERIAL_PROTOCOL(current_position[X_AXIS]);
-      SERIAL_PROTOCOLPGM("Y:");
-      SERIAL_PROTOCOL(current_position[Y_AXIS]);
-      SERIAL_PROTOCOLPGM("Z:");
-      SERIAL_PROTOCOL(current_position[Z_AXIS]);
-      SERIAL_PROTOCOLPGM("E:");
-      SERIAL_PROTOCOL(current_position[E_AXIS]);
+      SERIAL_PROTOCOLPGM("X:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(current_position[X_AXIS], fromsd[bufindr]);
+      SERIAL_PROTOCOLPGM("Y:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(current_position[Y_AXIS], fromsd[bufindr]);
+      SERIAL_PROTOCOLPGM("Z:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(current_position[Z_AXIS], fromsd[bufindr]);
+      SERIAL_PROTOCOLPGM("E:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(current_position[E_AXIS], fromsd[bufindr]);
 
-      SERIAL_PROTOCOLPGM(MSG_COUNT_X);
-      SERIAL_PROTOCOL(float(st_get_position(X_AXIS))/axis_steps_per_unit[X_AXIS]);
-      SERIAL_PROTOCOLPGM("Y:");
-      SERIAL_PROTOCOL(float(st_get_position(Y_AXIS))/axis_steps_per_unit[Y_AXIS]);
-      SERIAL_PROTOCOLPGM("Z:");
-      SERIAL_PROTOCOL(float(st_get_position(Z_AXIS))/axis_steps_per_unit[Z_AXIS]);
+      SERIAL_PROTOCOLPGM(MSG_COUNT_X, fromsd[bufindr]);
+      SERIAL_PROTOCOL(float(st_get_position(X_AXIS))/axis_steps_per_unit[X_AXIS], fromsd[bufindr]);
+      SERIAL_PROTOCOLPGM("Y:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(float(st_get_position(Y_AXIS))/axis_steps_per_unit[Y_AXIS], fromsd[bufindr]);
+      SERIAL_PROTOCOLPGM("Z:", fromsd[bufindr]);
+      SERIAL_PROTOCOL(float(st_get_position(Z_AXIS))/axis_steps_per_unit[Z_AXIS], fromsd[bufindr]);
 
-      SERIAL_PROTOCOLLN("");
+      SERIAL_PROTOCOLLN("", fromsd[bufindr]);
       break;
     case 120: // M120
       enable_endstops(false) ;
@@ -2168,30 +2173,30 @@ void process_commands()
       enable_endstops(true) ;
       break;
     case 119: // M119
-    SERIAL_PROTOCOLLN(MSG_M119_REPORT);
+    SERIAL_PROTOCOLLN(MSG_M119_REPORT, fromsd[bufindr]);
       #if defined(X_MIN_PIN) && X_MIN_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_X_MIN);
-        SERIAL_PROTOCOLLN(((READ(X_MIN_PIN)^X_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_X_MIN, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(X_MIN_PIN)^X_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       #if defined(X_MAX_PIN) && X_MAX_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_X_MAX);
-        SERIAL_PROTOCOLLN(((READ(X_MAX_PIN)^X_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_X_MAX, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(X_MAX_PIN)^X_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_Y_MIN);
-        SERIAL_PROTOCOLLN(((READ(Y_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_Y_MIN, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(Y_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_Y_MAX);
-        SERIAL_PROTOCOLLN(((READ(Y_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_Y_MAX, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(Y_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       #if defined(Z_MIN_PIN) && Z_MIN_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_Z_MIN);
-        SERIAL_PROTOCOLLN(((READ(Z_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_Z_MIN, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(Z_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
-        SERIAL_PROTOCOLPGM(MSG_Z_MAX);
-        SERIAL_PROTOCOLLN(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        SERIAL_PROTOCOLPGM(MSG_Z_MAX, fromsd[bufindr]);
+        SERIAL_PROTOCOLLN(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN), fromsd[bufindr]);
       #endif
       break;
       //TODO: update for all axis, use for loop
@@ -2480,19 +2485,19 @@ void process_commands()
         #endif
 
         updatePID();
-        SERIAL_PROTOCOL(MSG_OK);
-        SERIAL_PROTOCOL(" p:");
-        SERIAL_PROTOCOL(Kp);
-        SERIAL_PROTOCOL(" i:");
-        SERIAL_PROTOCOL(unscalePID_i(Ki));
-        SERIAL_PROTOCOL(" d:");
-        SERIAL_PROTOCOL(unscalePID_d(Kd));
+        SERIAL_PROTOCOL(MSG_OK, fromsd[bufindr]);
+        SERIAL_PROTOCOL(" p:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(Kp, fromsd[bufindr]);
+        SERIAL_PROTOCOL(" i:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(unscalePID_i(Ki), fromsd[bufindr]);
+        SERIAL_PROTOCOL(" d:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(unscalePID_d(Kd), fromsd[bufindr]);
         #ifdef PID_ADD_EXTRUSION_RATE
-        SERIAL_PROTOCOL(" c:");
+        SERIAL_PROTOCOL(" c:", fromsd[bufindr]);
         //Kc does not have scaling applied above, or in resetting defaults
-        SERIAL_PROTOCOL(Kc);
+        SERIAL_PROTOCOL(Kc, fromsd[bufindr]);
         #endif
-        SERIAL_PROTOCOLLN("");
+        SERIAL_PROTOCOLLN("", fromsd[bufindr]);
       }
       break;
     #endif //PIDTEMP
@@ -2504,14 +2509,14 @@ void process_commands()
         if(code_seen('D')) bedKd = scalePID_d(code_value());
 
         updatePID();
-        SERIAL_PROTOCOL(MSG_OK);
-        SERIAL_PROTOCOL(" p:");
-        SERIAL_PROTOCOL(bedKp);
-        SERIAL_PROTOCOL(" i:");
-        SERIAL_PROTOCOL(unscalePID_i(bedKi));
-        SERIAL_PROTOCOL(" d:");
-        SERIAL_PROTOCOL(unscalePID_d(bedKd));
-        SERIAL_PROTOCOLLN("");
+        SERIAL_PROTOCOL(MSG_OK, fromsd[bufindr]);
+        SERIAL_PROTOCOL(" p:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(bedKp, fromsd[bufindr]);
+        SERIAL_PROTOCOL(" i:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(unscalePID_i(bedKi), fromsd[budfindr]);
+        SERIAL_PROTOCOL(" d:", fromsd[bufindr]);
+        SERIAL_PROTOCOL(unscalePID_d(bedKd), fromsd[bufindr]);
+        SERIAL_PROTOCOLLN("", fromsd[bufindr]);
       }
       break;
     #endif //PIDTEMP
@@ -2542,9 +2547,9 @@ void process_commands()
 	  if (code_seen('C')) {
 	   lcd_setcontrast( ((int)code_value())&63 );
           }
-          SERIAL_PROTOCOLPGM("lcd contrast value: ");
-          SERIAL_PROTOCOL(lcd_contrast);
-          SERIAL_PROTOCOLLN("");
+          SERIAL_PROTOCOLPGM("lcd contrast value: ", fromsd[bufindr]);
+          SERIAL_PROTOCOL(lcd_contrast, fromsd[bufindr]);
+          SERIAL_PROTOCOLLN("", fromsd[bufindr]);
      }
     break;
 #endif
@@ -2590,22 +2595,22 @@ void process_commands()
 #endif    
     case 500: // M500 Store settings in EEPROM
     {
-        Config_StoreSettings();
+        Config_StoreSettings( fromsd[bufindr] );
     }
     break;
     case 501: // M501 Read settings from EEPROM
     {
-        Config_RetrieveSettings();
+        Config_RetrieveSettings( fromsd[bufindr] );
     }
     break;
     case 502: // M502 Revert to default settings
     {
-        Config_ResetDefault();
+        Config_ResetDefault( fromsd[bufindr] );
     }
     break;
     case 503: // M503 print settings currently in memory
     {
-        Config_PrintSettings();
+        Config_PrintSettings( fromsd[bufindr] );
     }
     break;
     #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
@@ -2863,10 +2868,10 @@ void process_commands()
   {
     tmp_extruder = code_value();
     if(tmp_extruder >= EXTRUDERS) {
-      SERIAL_ECHO_START;
-      SERIAL_ECHO("T");
-      SERIAL_ECHO(tmp_extruder);
-      SERIAL_ECHOLN(MSG_INVALID_EXTRUDER);
+      SERIAL_ECHO_START( fromsd[bufindr] );
+      SERIAL_ECHO("T", fromsd[bufindr]);
+      SERIAL_ECHO(tmp_extruder, fromsd[bufindr]);
+      SERIAL_ECHOLN(MSG_INVALID_EXTRUDER, fromsd[bufindr]);
     }
     else {
       boolean make_move = false;
@@ -2949,29 +2954,33 @@ void process_commands()
         }
       }
       #endif
-      SERIAL_ECHO_START;
-      SERIAL_ECHO(MSG_ACTIVE_EXTRUDER);
-      SERIAL_PROTOCOLLN((int)active_extruder);
+      SERIAL_ECHO_START( fromsd[bufindr] );
+      SERIAL_ECHO(MSG_ACTIVE_EXTRUDER, fromsd[bufindr]);
+      SERIAL_PROTOCOLLN((int)active_extruder, fromsd[bufindr]);
     }
   }
 
   else
   {
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPGM(MSG_UNKNOWN_COMMAND);
-    SERIAL_ECHO(cmdbuffer[bufindr]);
-    SERIAL_ECHOLNPGM("\"");
+    SERIAL_ECHO_START( fromsd[bufindr] );
+    SERIAL_ECHOPGM(MSG_UNKNOWN_COMMAND, fromsd[bufindr]);
+    SERIAL_ECHO(cmdbuffer[bufindr], fromsd[bufindr]);
+    SERIAL_ECHOLNPGM("\"", fromsd[bufindr]);
   }
 
   ClearToSend();
 }
 
+// Usata solo in ricezione dei comandi
 void FlushSerialRequestResend()
 {
   //char cmdbuffer[bufindr][100]="Resend:";
   MYSERIAL.flush();
-  SERIAL_PROTOCOLPGM(MSG_RESEND);
-  SERIAL_PROTOCOLLN(gcode_LastN + 1);
+  #ifdef USE_BT
+  BTSerial.flush();
+  #endif
+  SERIAL_PROTOCOLPGM(MSG_RESEND, fromsd[bufindw]);
+  SERIAL_PROTOCOLLN(gcode_LastN + 1, fromsd[bufindw]);
   ClearToSend();
 }
 
@@ -2979,12 +2988,13 @@ void ClearToSend()
 {
   previous_millis_cmd = millis();
   #ifdef SDSUPPORT
-  if(fromsd[bufindr])
+  if(fromsd[bufindr]==-1)
     return;
   #endif //SDSUPPORT
-  SERIAL_PROTOCOLLNPGM(MSG_OK);
   #ifdef USE_BT
-  BTSerial.write(MSG_OK);
+  SERIAL_PROTOCOLLNPGM(MSG_OK, fromsd[bufindr]);
+  #else
+  SERIAL_PROTOCOLLNPGM(MSG_OK);
   #endif
 }
 
@@ -3364,8 +3374,8 @@ void kill()
 #if defined(PS_ON_PIN) && PS_ON_PIN > -1
   pinMode(PS_ON_PIN,INPUT);
 #endif
-  SERIAL_ERROR_START;
-  SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
+  SERIAL_ERROR_START(0);
+  SERIAL_ERRORLNPGM(MSG_ERR_KILLED,0);
   LCD_ALERTMESSAGEPGM(MSG_KILLED);
   suicide();
   while(1) { /* Intentionally left empty */ } // Wait for reset
@@ -3377,8 +3387,8 @@ void Stop()
   if(Stopped == false) {
     Stopped = true;
     Stopped_gcode_LastN = gcode_LastN; // Save last g_code for restart
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_ERR_STOPPED);
+    SERIAL_ERROR_START(0);
+    SERIAL_ERRORLNPGM(MSG_ERR_STOPPED,0);
     LCD_MESSAGEPGM(MSG_STOPPED);
   }
 }
@@ -3460,22 +3470,22 @@ bool setTargetedHotend(int code){
   if(code_seen('T')) {
     tmp_extruder = code_value();
     if(tmp_extruder >= EXTRUDERS) {
-      SERIAL_ECHO_START;
+      SERIAL_ECHO_START( fromsd[bufindr] );
       switch(code){
         case 104:
-          SERIAL_ECHO(MSG_M104_INVALID_EXTRUDER);
+          SERIAL_ECHO(MSG_M104_INVALID_EXTRUDER, fromsd[bufindr]);
           break;
         case 105:
-          SERIAL_ECHO(MSG_M105_INVALID_EXTRUDER);
+          SERIAL_ECHO(MSG_M105_INVALID_EXTRUDER, fromsd[bufindr]);
           break;
         case 109:
-          SERIAL_ECHO(MSG_M109_INVALID_EXTRUDER);
+          SERIAL_ECHO(MSG_M109_INVALID_EXTRUDER, fromsd[bufindr]);
           break;
         case 218:
-          SERIAL_ECHO(MSG_M218_INVALID_EXTRUDER);
+          SERIAL_ECHO(MSG_M218_INVALID_EXTRUDER, fromsd[bufindr]);
           break;
       }
-      SERIAL_ECHOLN(tmp_extruder);
+      SERIAL_ECHOLN(tmp_extruder, fromsd[bufindr]);
       return true;
     }
   }

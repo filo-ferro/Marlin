@@ -45,7 +45,7 @@ void _EEPROM_readData(int &pos, uint8_t* value, uint8_t size)
 #define EEPROM_VERSION "V09"
 
 #ifdef EEPROM_SETTINGS
-void Config_StoreSettings() 
+void Config_StoreSettings( int s ) 
 {
   char ver[4]= "000";
   float dummy;
@@ -116,105 +116,105 @@ void Config_StoreSettings()
   EEPROM_WRITE_VAR(i,ver2); // validate data
   i=SHAREBOT_EEPROM_OFFSET;
   EEPROM_WRITE_VAR(i,ver2);
-  SERIAL_ECHO_START;
-  SERIAL_ECHOLNPGM("Settings Stored");
+  SERIAL_ECHO_START( s );
+  SERIAL_ECHOLNPGM("Settings Stored", s);
 }
 #endif //EEPROM_SETTINGS
 
 
 #ifndef DISABLE_M503
-void Config_PrintSettings()
+void Config_PrintSettings( int s )
 {  // Always have this function, even with EEPROM_SETTINGS disabled, the current values will be shown
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Steps per unit:");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M92 X",axis_steps_per_unit[0]);
-    SERIAL_ECHOPAIR(" Y",axis_steps_per_unit[1]);
-    SERIAL_ECHOPAIR(" Z",axis_steps_per_unit[2]);
-    SERIAL_ECHOPAIR(" E",axis_steps_per_unit[3]);
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Steps per unit:", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M92 X",axis_steps_per_unit[0], s);
+    SERIAL_ECHOPAIR(" Y",axis_steps_per_unit[1], s);
+    SERIAL_ECHOPAIR(" Z",axis_steps_per_unit[2], s);
+    SERIAL_ECHOPAIR(" E",axis_steps_per_unit[3], s);
+    SERIAL_ECHOLN("", s);
       
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Maximum feedrates (mm/s):");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M203 X",max_feedrate[0]);
-    SERIAL_ECHOPAIR(" Y",max_feedrate[1] ); 
-    SERIAL_ECHOPAIR(" Z", max_feedrate[2] ); 
-    SERIAL_ECHOPAIR(" E", max_feedrate[3]);
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Maximum feedrates (mm/s):", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M203 X",max_feedrate[0], s);
+    SERIAL_ECHOPAIR(" Y",max_feedrate[1], s ); 
+    SERIAL_ECHOPAIR(" Z", max_feedrate[2], s ); 
+    SERIAL_ECHOPAIR(" E", max_feedrate[3], s);
+    SERIAL_ECHOLN("", s);
 
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Maximum Acceleration (mm/s2):");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M201 X" ,max_acceleration_units_per_sq_second[0] ); 
-    SERIAL_ECHOPAIR(" Y" , max_acceleration_units_per_sq_second[1] ); 
-    SERIAL_ECHOPAIR(" Z" ,max_acceleration_units_per_sq_second[2] );
-    SERIAL_ECHOPAIR(" E" ,max_acceleration_units_per_sq_second[3]);
-    SERIAL_ECHOLN("");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Acceleration: S=acceleration, T=retract acceleration");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M204 S",acceleration ); 
-    SERIAL_ECHOPAIR(" T" ,retract_acceleration);
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Maximum Acceleration (mm/s2):", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M201 X" ,max_acceleration_units_per_sq_second[0], s ); 
+    SERIAL_ECHOPAIR(" Y" , max_acceleration_units_per_sq_second[1], s ); 
+    SERIAL_ECHOPAIR(" Z" ,max_acceleration_units_per_sq_second[2], s );
+    SERIAL_ECHOPAIR(" E" ,max_acceleration_units_per_sq_second[3], s);
+    SERIAL_ECHOLN("", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Acceleration: S=acceleration, T=retract acceleration", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M204 S",acceleration, s ); 
+    SERIAL_ECHOPAIR(" T" ,retract_acceleration, s);
+    SERIAL_ECHOLN("", s);
 
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Advanced variables: S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M205 S",minimumfeedrate ); 
-    SERIAL_ECHOPAIR(" T" ,mintravelfeedrate ); 
-    SERIAL_ECHOPAIR(" B" ,minsegmenttime ); 
-    SERIAL_ECHOPAIR(" X" ,max_xy_jerk ); 
-    SERIAL_ECHOPAIR(" Z" ,max_z_jerk);
-    SERIAL_ECHOPAIR(" E" ,max_e_jerk);
-    SERIAL_ECHOLN(""); 
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Advanced variables: S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M205 S",minimumfeedrate, s ); 
+    SERIAL_ECHOPAIR(" T" ,mintravelfeedrate, s ); 
+    SERIAL_ECHOPAIR(" B" ,minsegmenttime, s ); 
+    SERIAL_ECHOPAIR(" X" ,max_xy_jerk, s ); 
+    SERIAL_ECHOPAIR(" Z" ,max_z_jerk, s);
+    SERIAL_ECHOPAIR(" E" ,max_e_jerk, s);
+    SERIAL_ECHOLN("", s); 
 
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Home offset (mm):");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M206 X",add_homeing[0] );
-    SERIAL_ECHOPAIR(" Y" ,add_homeing[1] );
-    SERIAL_ECHOPAIR(" Z" ,add_homeing[2] );
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Home offset (mm):", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M206 X",add_homeing[0], s );
+    SERIAL_ECHOPAIR(" Y" ,add_homeing[1], s );
+    SERIAL_ECHOPAIR(" Z" ,add_homeing[2], s );
+    SERIAL_ECHOLN("", s);
 
 #if EXTRUDERS > 1
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Extruders offset (mm):");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M218 T0 X" ,extruder_offset[X_AXIS][0] );
-    SERIAL_ECHOPAIR(" Y" ,extruder_offset[Y_AXIS][0] );
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Extruders offset (mm):", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M218 T0 X" ,extruder_offset[X_AXIS][0], s );
+    SERIAL_ECHOPAIR(" Y" ,extruder_offset[Y_AXIS][0], s );
+    SERIAL_ECHOLN("", s);
 
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M218 T1 X" ,extruder_offset[X_AXIS][1] );
-    SERIAL_ECHOPAIR(" Y" ,extruder_offset[Y_AXIS][1] );
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M218 T1 X" ,extruder_offset[X_AXIS][1], s );
+    SERIAL_ECHOPAIR(" Y" ,extruder_offset[Y_AXIS][1], s );
+    SERIAL_ECHOLN("", s);
 #endif
 
 #ifdef DELTA
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Endstop adjustement (mm):");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M666 X",endstop_adj[0] );
-    SERIAL_ECHOPAIR(" Y" ,endstop_adj[1] );
-    SERIAL_ECHOPAIR(" Z" ,endstop_adj[2] );
-    SERIAL_ECHOLN("");
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("Endstop adjustement (mm):", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("  M666 X",endstop_adj[0], s );
+    SERIAL_ECHOPAIR(" Y" ,endstop_adj[1], s );
+    SERIAL_ECHOPAIR(" Z" ,endstop_adj[2], s );
+    SERIAL_ECHOLN("", s);
 #endif
 #ifdef PIDTEMP
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("PID settings:");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   M301 P",Kp); 
-    SERIAL_ECHOPAIR(" I" ,unscalePID_i(Ki)); 
-    SERIAL_ECHOPAIR(" D" ,unscalePID_d(Kd));
-    SERIAL_ECHOLN(""); 
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOLNPGM("PID settings:", s);
+    SERIAL_ECHO_START( s );
+    SERIAL_ECHOPAIR("   M301 P",Kp, s); 
+    SERIAL_ECHOPAIR(" I" ,unscalePID_i(Ki), s); 
+    SERIAL_ECHOPAIR(" D" ,unscalePID_d(Kd), s);
+    SERIAL_ECHOLN("", s); 
 #endif
 } 
 #endif
 
 
 #ifdef EEPROM_SETTINGS
-void Config_RetrieveSettings()
+void Config_RetrieveSettings( int s )
 {
     int i=EEPROM_OFFSET;
     char stored_ver[4];
@@ -286,26 +286,26 @@ void Config_RetrieveSettings()
             EEPROM_READ_VAR(i, ofdmy );
             EEPROM_READ_VAR(i, ofdmy );
 #endif
-            SERIAL_ECHO_START;
+            SERIAL_ECHO_START( s );
 #if MACHINE_3D != 1
-            SERIAL_ECHOLNPGM("Sharebot stored settings retrieved");
+            SERIAL_ECHOLNPGM("Sharebot stored settings retrieved", s);
 #endif
          }
 
-        SERIAL_ECHO_START;
-        SERIAL_ECHOLNPGM("Stored settings retrieved");
+        SERIAL_ECHO_START( s );
+        SERIAL_ECHOLNPGM("Stored settings retrieved", s);
     }
     else
     {
-        Config_ResetDefault();
+        Config_ResetDefault( s );
     }
     #ifdef EEPROM_CHITCHAT
-      Config_PrintSettings();
+      Config_PrintSettings( s );
     #endif
 }
 #endif
 
-void Config_ResetDefault()
+void Config_ResetDefault( int s )
 {
     float tmp1[]=DEFAULT_AXIS_STEPS_PER_UNIT;
     float tmp2[]=DEFAULT_MAX_FEEDRATE;
@@ -362,7 +362,7 @@ void Config_ResetDefault()
     extruder_offset[X_AXIS][1]=0.0f;
     extruder_offset[Y_AXIS][1]=0.0f;
 #endif
-SERIAL_ECHO_START;
-SERIAL_ECHOLNPGM("Hardcoded Default Settings Loaded");
+SERIAL_ECHO_START( s );
+SERIAL_ECHOLNPGM("Hardcoded Default Settings Loaded", s);
 
 }

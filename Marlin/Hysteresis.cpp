@@ -80,6 +80,7 @@ void Hysteresis::calcSteps()
 //===========================================================================
 void Hysteresis::ReportToSerial()
 {
+  /*
   SERIAL_PROTOCOLPGM("H=X");
   SERIAL_PROTOCOL(m_hysteresis_mm[X_AXIS]);
   SERIAL_PROTOCOLPGM(" Y");
@@ -98,6 +99,7 @@ void Hysteresis::ReportToSerial()
   SERIAL_PROTOCOL(axis_shift[E_AXIS]);
   
   SERIAL_PROTOCOLLN("");
+  */
 }
 
 //===========================================================================

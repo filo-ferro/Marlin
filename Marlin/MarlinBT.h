@@ -24,7 +24,7 @@
 #include "Marlin.h"
 
 #if !defined(SERIAL_BT) 
-#define SERIAL_BT 1
+#define SERIAL_BT 0
 #endif
 
 // The presence of the UBRRH register is used to detect a UART.

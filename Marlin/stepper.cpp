@@ -170,21 +170,21 @@ asm volatile ( \
 void checkHitEndstops()
 {
  if( endstop_x_hit || endstop_y_hit || endstop_z_hit) {
-   SERIAL_ECHO_START;
-   SERIAL_ECHOPGM(MSG_ENDSTOPS_HIT);
+   SERIAL_ECHO_START(0);
+   SERIAL_ECHOPGM(MSG_ENDSTOPS_HIT,0);
    if(endstop_x_hit) {
-     SERIAL_ECHOPAIR(" X:",(float)endstops_trigsteps[X_AXIS]/axis_steps_per_unit[X_AXIS]);
+     SERIAL_ECHOPAIR(" X:",(float)endstops_trigsteps[X_AXIS]/axis_steps_per_unit[X_AXIS], 0);
      LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "X");
    }
    if(endstop_y_hit) {
-     SERIAL_ECHOPAIR(" Y:",(float)endstops_trigsteps[Y_AXIS]/axis_steps_per_unit[Y_AXIS]);
+     SERIAL_ECHOPAIR(" Y:",(float)endstops_trigsteps[Y_AXIS]/axis_steps_per_unit[Y_AXIS], 0);
      LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "Y");
    }
    if(endstop_z_hit) {
-     SERIAL_ECHOPAIR(" Z:",(float)endstops_trigsteps[Z_AXIS]/axis_steps_per_unit[Z_AXIS]);
+     SERIAL_ECHOPAIR(" Z:",(float)endstops_trigsteps[Z_AXIS]/axis_steps_per_unit[Z_AXIS], 0);
      LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "Z");
    }
-   SERIAL_ECHOLN("");
+   SERIAL_ECHOLN("",0);
    endstop_x_hit=false;
    endstop_y_hit=false;
    endstop_z_hit=false;
@@ -1258,21 +1258,21 @@ void microstep_mode(uint8_t driver, uint8_t stepping_mode)
 
 void microstep_readings()
 {
-      SERIAL_PROTOCOLPGM("MS1,MS2 Pins\n");
-      SERIAL_PROTOCOLPGM("X: ");
-      SERIAL_PROTOCOL(   digitalRead(X_MS1_PIN));
-      SERIAL_PROTOCOLLN( digitalRead(X_MS2_PIN));
-      SERIAL_PROTOCOLPGM("Y: ");
-      SERIAL_PROTOCOL(   digitalRead(Y_MS1_PIN));
-      SERIAL_PROTOCOLLN( digitalRead(Y_MS2_PIN));
-      SERIAL_PROTOCOLPGM("Z: ");
-      SERIAL_PROTOCOL(   digitalRead(Z_MS1_PIN));
-      SERIAL_PROTOCOLLN( digitalRead(Z_MS2_PIN));
-      SERIAL_PROTOCOLPGM("E0: ");
-      SERIAL_PROTOCOL(   digitalRead(E0_MS1_PIN));
-      SERIAL_PROTOCOLLN( digitalRead(E0_MS2_PIN));
-      SERIAL_PROTOCOLPGM("E1: ");
-      SERIAL_PROTOCOL(   digitalRead(E1_MS1_PIN));
-      SERIAL_PROTOCOLLN( digitalRead(E1_MS2_PIN));
+      SERIAL_PROTOCOLPGM("MS1,MS2 Pins\n", 0);
+      SERIAL_PROTOCOLPGM("X: ", 0);
+      SERIAL_PROTOCOL(   digitalRead(X_MS1_PIN), 0);
+      SERIAL_PROTOCOLLN( digitalRead(X_MS2_PIN), 0);
+      SERIAL_PROTOCOLPGM("Y: ", 0);
+      SERIAL_PROTOCOL(   digitalRead(Y_MS1_PIN), 0);
+      SERIAL_PROTOCOLLN( digitalRead(Y_MS2_PIN), 0);
+      SERIAL_PROTOCOLPGM("Z: ", 0);
+      SERIAL_PROTOCOL(   digitalRead(Z_MS1_PIN), 0);
+      SERIAL_PROTOCOLLN( digitalRead(Z_MS2_PIN), 0);
+      SERIAL_PROTOCOLPGM("E0: ", 0);
+      SERIAL_PROTOCOL(   digitalRead(E0_MS1_PIN), 0);
+      SERIAL_PROTOCOLLN( digitalRead(E0_MS2_PIN), 0);
+      SERIAL_PROTOCOLPGM("E1: ", 0);
+      SERIAL_PROTOCOL(   digitalRead(E1_MS1_PIN), 0);
+      SERIAL_PROTOCOLLN( digitalRead(E1_MS2_PIN), 0);
 }
 

@@ -64,36 +64,67 @@
   #define MYSERIAL MSerial
 #endif
 
+#ifndef USE_BT
 #define SERIAL_PROTOCOL(x) (MYSERIAL.print(x))
 #define SERIAL_PROTOCOL_F(x,y) (MYSERIAL.print(x,y))
 #define SERIAL_PROTOCOLPGM(x) (serialprintPGM(PSTR(x)))
 #define SERIAL_PROTOCOLLN(x) (MYSERIAL.print(x),MYSERIAL.write('\n'))
 #define SERIAL_PROTOCOLLNPGM(x) (serialprintPGM(PSTR(x)),MYSERIAL.write('\n'))
+#else
+#define SERIAL0_PROTOCOL(x) (MYSERIAL.print(x))
+#define SERIAL_PROTOCOL(x,y) {if((y)==0) MYSERIAL.print(x); else BTSerial.print(x);}
+#define SERIAL_PROTOCOL_F(x,y,s) {if((s)==0) { MYSERIAL.print(x,y); } else { BTSerial.print(x,y); } }
+#define SERIAL0_PROTOCOLPGM(x) (serialprintPGM0(PSTR(x)))
+#define SERIAL_PROTOCOLPGM(x,y) (serialprintPGM(PSTR(x),(y)))
+#define SERIAL0_PROTOCOLLN(x) (MYSERIAL.print(x),MYSERIAL.write('\n'))
+#define SERIAL_PROTOCOLLN(x,y) {if((y)==0) {MYSERIAL.print(x); MYSERIAL.write('\n');} else {BTSerial.print(x); BTSerial.write('\n'); } }
+#define SERIAL0_PROTOCOLLNPGM(x) (serialprintPGM0(PSTR(x)),MYSERIAL.write('\n'))
+#define SERIAL_PROTOCOLLNPGM(x,y) {serialprintPGM(PSTR(x),(y));SERIAL_PROTOCOL('\n',(y));}
+#endif
 
 
 const char errormagic[] PROGMEM ="Error:";
 const char echomagic[] PROGMEM ="echo:";
-#define SERIAL_ERROR_START (serialprintPGM(errormagic))
-#define SERIAL_ERROR(x) SERIAL_PROTOCOL(x)
-#define SERIAL_ERRORPGM(x) SERIAL_PROTOCOLPGM(x)
-#define SERIAL_ERRORLN(x) SERIAL_PROTOCOLLN(x)
-#define SERIAL_ERRORLNPGM(x) SERIAL_PROTOCOLLNPGM(x)
+#define SERIAL_ERROR_START(x) (serialprintPGM(errormagic,x))
+#define SERIAL0_ERROR(x) SERIAL0_PROTOCOL(x)
+#define SERIAL_ERROR(x,y) SERIAL_PROTOCOL(x,y)
+#define SERIAL_ERRORPGM(x,y) SERIAL_PROTOCOLPGM(x,y)
+#define SERIAL_ERRORLN(x,y) SERIAL_PROTOCOLLN(x,y)
+#define SERIAL_ERRORLNPGM(x,y) SERIAL_PROTOCOLLNPGM(x,y)
 
-#define SERIAL_ECHO_START (serialprintPGM(echomagic))
-#define SERIAL_ECHO(x) SERIAL_PROTOCOL(x)
-#define SERIAL_ECHOPGM(x) SERIAL_PROTOCOLPGM(x)
-#define SERIAL_ECHOLN(x) SERIAL_PROTOCOLLN(x)
-#define SERIAL_ECHOLNPGM(x) SERIAL_PROTOCOLLNPGM(x)
+#define SERIAL0_ECHO_START (serialprintPGM0(echomagic))
+#define SERIAL_ECHO_START(y) (serialprintPGM(echomagic,(y)))
+#define SERIAL0_ECHO(x) SERIAL0_PROTOCOL(x)
+#define SERIAL_ECHO(x,y) SERIAL_PROTOCOL(x,y)
+#define SERIAL0_ECHOPGM(x) SERIAL0_PROTOCOLPGM(x)
+#define SERIAL_ECHOPGM(x,y) SERIAL_PROTOCOLPGM(x,y)
+#define SERIAL0_ECHOLN(x) SERIAL0_PROTOCOLLN(x)
+#define SERIAL_ECHOLN(x,y) SERIAL_PROTOCOLLN(x,y)
+#define SERIAL0_ECHOLNPGM(x) SERIAL0_PROTOCOLLNPGM(x)
+#define SERIAL_ECHOLNPGM(x,y) SERIAL_PROTOCOLLNPGM(x,y)
 
-#define SERIAL_ECHOPAIR(name,value) (serial_echopair_P(PSTR(name),(value)))
+#define SERIAL_ECHOPAIR(name,value,s) (serial_echopair_P(PSTR(name),(value),(s)))
 
-void serial_echopair_P(const char *s_P, float v);
-void serial_echopair_P(const char *s_P, double v);
-void serial_echopair_P(const char *s_P, unsigned long v);
+void serial_echopair_P(const char *s_P, float v, int s);
+void serial_echopair_P(const char *s_P, double v, int s);
+void serial_echopair_P(const char *s_P, unsigned long v, int s);
 
 
 //things to write to serial from Programmemory. saves 400 to 2k of RAM.
-FORCE_INLINE void serialprintPGM(const char *str)
+FORCE_INLINE void serialprintPGM(const char *str, int serial)
+{
+  char ch=pgm_read_byte(str);
+  while(ch)
+  {
+    if ( serial == 0 )
+       MYSERIAL.write(ch);
+    else
+       BTSerial.write(ch);
+    ch=pgm_read_byte(++str);
+  }
+}
+
+FORCE_INLINE void serialprintPGM0(const char *str)
 {
   char ch=pgm_read_byte(str);
   while(ch)

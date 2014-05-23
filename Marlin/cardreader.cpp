@@ -79,9 +79,9 @@ void  CardReader::lsDive(const char *prepend,SdFile parent)
       {
         if(lsAction==LS_SerialPrint)
         {
-          SERIAL_ECHO_START;
-          SERIAL_ECHOLN(MSG_SD_CANT_OPEN_SUBDIR);
-          SERIAL_ECHOLN(lfilename);
+          SERIAL_ECHO_START( 0 );
+          SERIAL_ECHOLN(MSG_SD_CANT_OPEN_SUBDIR, 0);
+          SERIAL_ECHOLN(lfilename, 0);
         }
       }
       lsDive(path,dir);
@@ -114,8 +114,8 @@ void  CardReader::lsDive(const char *prepend,SdFile parent)
       createFilename(filename,p);
       if(lsAction==LS_SerialPrint)
       {
-        SERIAL_PROTOCOL(prepend);
-        SERIAL_PROTOCOLLN(filename);
+        SERIAL_PROTOCOL(prepend, 0);
+        SERIAL_PROTOCOLLN(filename, 0);
       }
       else if(lsAction==LS_Count)
       {
@@ -155,31 +155,31 @@ void CardReader::initsd()
 #endif
   {
     //if (!card.init(SPI_HALF_SPEED,SDSS))
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
+    SERIAL_ECHO_START( 0 );
+    SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL, 0);
   }
   else if (!volume.init(&card))
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
+    SERIAL_ERROR_START( 0 );
+    SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL, 0);
   }
   else if (!root.openRoot(&volume)) 
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
+    SERIAL_ERROR_START( 0 );
+    SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL, 0);
   }
   else 
   {
     cardOK = true;
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM(MSG_SD_CARD_OK);
+    SERIAL_ECHO_START( 0 );
+    SERIAL_ECHOLNPGM(MSG_SD_CARD_OK, 0);
   }
   workDir=root;
   curDir=&root;
   /*
   if(!workDir.openRoot(&volume))
   {
-    SERIAL_ECHOLNPGM(MSG_SD_WORKDIR_FAIL);
+    SERIAL_ECHOLNPGM(MSG_SD_WORKDIR_FAIL, 0);
   }
   */
   
@@ -252,41 +252,41 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
     {
      if((int)file_subcall_ctr>(int)SD_PROCEDURE_DEPTH-1)
      {
-       SERIAL_ERROR_START;
-       SERIAL_ERRORPGM("trying to call sub-gcode files with too many levels. MAX level is:");
-       SERIAL_ERRORLN(SD_PROCEDURE_DEPTH);
+       SERIAL_ERROR_START( 0 );
+       SERIAL_ERRORPGM("trying to call sub-gcode files with too many levels. MAX level is:", 0);
+       SERIAL_ERRORLN(SD_PROCEDURE_DEPTH, 0);
        kill();
        return;
      }
      
-     SERIAL_ECHO_START;
-     SERIAL_ECHOPGM("SUBROUTINE CALL target:\"");
-     SERIAL_ECHO(name);
-     SERIAL_ECHOPGM("\" parent:\"");
+     SERIAL_ECHO_START( 0 );
+     SERIAL_ECHOPGM("SUBROUTINE CALL target:\"", 0);
+     SERIAL_ECHO(name, 0);
+     SERIAL_ECHOPGM("\" parent:\"", 0);
      
      //store current filename and position
      getAbsFilename(filenames[file_subcall_ctr]);
      
-     SERIAL_ECHO(filenames[file_subcall_ctr]);
-     SERIAL_ECHOPGM("\" pos");
-     SERIAL_ECHOLN(sdpos);
+     SERIAL_ECHO(filenames[file_subcall_ctr], 0);
+     SERIAL_ECHOPGM("\" pos", 0);
+     SERIAL_ECHOLN(sdpos, 0);
      filespos[file_subcall_ctr]=sdpos;
      file_subcall_ctr++;
     }
     else
     {
-     SERIAL_ECHO_START;
-     SERIAL_ECHOPGM("Now doing file: ");
-     SERIAL_ECHOLN(name);
+     SERIAL_ECHO_START( 0 );
+     SERIAL_ECHOPGM("Now doing file: ", 0);
+     SERIAL_ECHOLN(name, 0);
     }
     file.close();
   }
   else //opening fresh file
   {
     file_subcall_ctr=0; //resetting procedure depth in case user cancels print while in procedure
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPGM("Now fresh file: ");
-    SERIAL_ECHOLN(name);
+    SERIAL_ECHO_START( 0 );
+    SERIAL_ECHOPGM("Now fresh file: ", 0);
+    SERIAL_ECHOLN(name, 0);
   }
   sdprinting = false;
   
@@ -309,12 +309,12 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
         char subdirname[13];
         strncpy(subdirname, dirname_start, dirname_end-dirname_start);
         subdirname[dirname_end-dirname_start]=0;
-        SERIAL_ECHOLN(subdirname);
+        SERIAL_ECHOLN(subdirname, 0);
         if(!myDir.open(curDir,subdirname,O_READ))
         {
-          SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL);
-          SERIAL_PROTOCOL(subdirname);
-          SERIAL_PROTOCOLLNPGM(".");
+          SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL, 0);
+          SERIAL_PROTOCOL(subdirname, 0);
+          SERIAL_PROTOCOLLNPGM(".", 0);
           return;
         }
         else
@@ -344,35 +344,35 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
     if (file.open(curDir, fname, O_READ)) 
     {
       filesize = file.fileSize();
-      SERIAL_PROTOCOLPGM(MSG_SD_FILE_OPENED);
-      SERIAL_PROTOCOL(fname);
-      SERIAL_PROTOCOLPGM(MSG_SD_SIZE);
-      SERIAL_PROTOCOLLN(filesize);
+      SERIAL_PROTOCOLPGM(MSG_SD_FILE_OPENED, 0);
+      SERIAL_PROTOCOL(fname, 0);
+      SERIAL_PROTOCOLPGM(MSG_SD_SIZE, 0);
+      SERIAL_PROTOCOLLN(filesize, 0);
       sdpos = 0;
       
-      SERIAL_PROTOCOLLNPGM(MSG_SD_FILE_SELECTED);
+      SERIAL_PROTOCOLLNPGM(MSG_SD_FILE_SELECTED, 0);
       lcd_setstatus(fname);
     }
     else
     {
-      SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL);
-      SERIAL_PROTOCOL(fname);
-      SERIAL_PROTOCOLLNPGM(".");
+      SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL, 0);
+      SERIAL_PROTOCOL(fname, 0);
+      SERIAL_PROTOCOLLNPGM(".", 0);
     }
   }
   else 
   { //write
     if (!file.open(curDir, fname, O_CREAT | O_APPEND | O_WRITE | O_TRUNC))
     {
-      SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL);
-      SERIAL_PROTOCOL(fname);
-      SERIAL_PROTOCOLLNPGM(".");
+      SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL, 0);
+      SERIAL_PROTOCOL(fname, 0);
+      SERIAL_PROTOCOLLNPGM(".", 0);
     }
     else
     {
       saving = true;
-      SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE);
-      SERIAL_PROTOCOLLN(name);
+      SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE, 0);
+      SERIAL_PROTOCOLLN(name, 0);
       lcd_setstatus(fname);
     }
   }
@@ -405,17 +405,17 @@ void CardReader::removeFile(char* name)
         char subdirname[13];
         strncpy(subdirname, dirname_start, dirname_end-dirname_start);
         subdirname[dirname_end-dirname_start]=0;
-        SERIAL_ECHOLN(subdirname);
+        SERIAL_ECHOLN(subdirname, 0);
         if(!myDir.open(curDir,subdirname,O_READ))
         {
-          SERIAL_PROTOCOLPGM("open failed, File: ");
-          SERIAL_PROTOCOL(subdirname);
-          SERIAL_PROTOCOLLNPGM(".");
+          SERIAL_PROTOCOLPGM("open failed, File: ", 0);
+          SERIAL_PROTOCOL(subdirname, 0);
+          SERIAL_PROTOCOLLNPGM(".", 0);
           return;
         }
         else
         {
-          //SERIAL_ECHOLN("dive ok");
+          //SERIAL_ECHOLN("dive ok", 0);
         }
           
         curDir=&myDir; 
@@ -424,8 +424,8 @@ void CardReader::removeFile(char* name)
       else // the reminder after all /fsa/fdsa/ is the filename
       {
         fname=dirname_start;
-        //SERIAL_ECHOLN("remaider");
-        //SERIAL_ECHOLN(fname);
+        //SERIAL_ECHOLN("remaider", 0);
+        //SERIAL_ECHOLN(fname, 0);
         break;
       }
       
@@ -437,15 +437,15 @@ void CardReader::removeFile(char* name)
   }
     if (file.remove(curDir, fname)) 
     {
-      SERIAL_PROTOCOLPGM("File deleted:");
-      SERIAL_PROTOCOL(fname);
+      SERIAL_PROTOCOLPGM("File deleted:", 0);
+      SERIAL_PROTOCOL(fname, 0);
       sdpos = 0;
     }
     else
     {
-      SERIAL_PROTOCOLPGM("Deletion failed, File: ");
-      SERIAL_PROTOCOL(fname);
-      SERIAL_PROTOCOLLNPGM(".");
+      SERIAL_PROTOCOLPGM("Deletion failed, File: ", 0);
+      SERIAL_PROTOCOL(fname, 0);
+      SERIAL_PROTOCOLLNPGM(".", 0);
     }
   
 }
@@ -453,13 +453,13 @@ void CardReader::removeFile(char* name)
 void CardReader::getStatus()
 {
   if(cardOK){
-    SERIAL_PROTOCOLPGM(MSG_SD_PRINTING_BYTE);
-    SERIAL_PROTOCOL(sdpos);
-    SERIAL_PROTOCOLPGM("/");
-    SERIAL_PROTOCOLLN(filesize);
+    SERIAL_PROTOCOLPGM(MSG_SD_PRINTING_BYTE, 0);
+    SERIAL_PROTOCOL(sdpos, 0);
+    SERIAL_PROTOCOLPGM("/", 0);
+    SERIAL_PROTOCOLLN(filesize, 0);
   }
   else{
-    SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING);
+    SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING, 0);
   }
 }
 void CardReader::write_command(char *buf)
@@ -480,8 +480,8 @@ void CardReader::write_command(char *buf)
   file.write(begin);
   if (file.writeError)
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_ERR_WRITE_TO_FILE);
+    SERIAL_ERROR_START( 0 );
+    SERIAL_ERRORLNPGM(MSG_SD_ERR_WRITE_TO_FILE, 0);
   }
 }
 
@@ -584,9 +584,9 @@ void CardReader::chdir(const char * relpath)
   
   if(!newfile.open(*parent,relpath, O_READ))
   {
-   SERIAL_ECHO_START;
-   SERIAL_ECHOPGM(MSG_SD_CANT_ENTER_SUBDIR);
-   SERIAL_ECHOLN(relpath);
+   SERIAL_ECHO_START( 0 );
+   SERIAL_ECHOPGM(MSG_SD_CANT_ENTER_SUBDIR, 0);
+   SERIAL_ECHOLN(relpath, 0);
   }
   else
   {
