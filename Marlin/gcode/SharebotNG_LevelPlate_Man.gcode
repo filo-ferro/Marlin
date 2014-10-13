@@ -31,6 +31,6 @@ G1 X130 Y100
 G1 Z0
 ;M71 (Verifica viti)
 M71 (Check screws)
-G1 Z10
+G1 Z180
 M117 Sharebot NG     
 M84

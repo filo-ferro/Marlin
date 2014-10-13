@@ -48,7 +48,8 @@ static void lcd_ut_level_plate_a();
 static void lcd_ut_level_plate_m();
 static void lcd_ut_change_right();
 static void lcd_ut_change_left();
-static void lcd_ut_nozzles();
+static void lcd_ut_movedown();
+static void lcd_ut_dual();
 static void lcd_cooldown();
 
 /* Different menus */
@@ -630,7 +631,7 @@ static void lcd_prepare_menu()
     MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
     MENU_ITEM(function, MSG_PLATE_LEVEL_A, lcd_ut_level_plate_a);
     MENU_ITEM(function, MSG_PLATE_LEVEL_M, lcd_ut_level_plate_m);
-    //MENU_ITEM(function, MSG_NOZZLES, lcd_ut_nozzles);
+    MENU_ITEM(function, MSG_MOVEDOWN, lcd_ut_movedown);
 #if EXTRUDERS > 1
     if ( card.printingpaused ) {
         MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600 T0"));
@@ -639,6 +640,7 @@ static void lcd_prepare_menu()
         MENU_ITEM(function, MSG_CHANGE_RIGHT, lcd_ut_change_right);
         MENU_ITEM(function, MSG_CHANGE_LEFT, lcd_ut_change_left);
     }
+    MENU_ITEM(function, MSG_DUAL_CALIBRATION, lcd_ut_dual);
 #else
     if ( card.printingpaused ) {
         MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600"));
@@ -1108,6 +1110,12 @@ static void lcd_ut_level_plate_m()
 
 static void lcd_ut_change_right()
 {
+  utility.startMemprint(3);
+  lcd_return_to_status();
+}
+
+static void lcd_ut_movedown()
+{
   utility.startMemprint(4);
   lcd_return_to_status();
 }
@@ -1118,9 +1126,9 @@ static void lcd_ut_change_left()
   lcd_return_to_status();
 }
 
-static void lcd_ut_nozzles()
+static void lcd_ut_dual()
 {
-  utility.startMemprint(3);
+  utility.startMemprint(6);
   lcd_return_to_status();
 }
 
