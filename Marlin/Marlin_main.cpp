@@ -294,6 +294,13 @@ float forced_M106;
 float forced_M109;
 float forced_M190;
 
+//#define USE_FILAMENT_DETECTION
+// Forced filament change from filament detection
+#ifdef USE_FILAMENT_DETECTION
+boolean forced_M600 = false;
+boolean forced_M600_inqueue = false;
+#endif
+
 //===========================================================================
 //=============================Private Variables=============================
 //===========================================================================
@@ -610,6 +617,18 @@ void loop()
 
 void get_command()
 {
+#ifdef USE_FILAMENT_DETECTION
+  if ( ( forced_M600 == true ) && ( buflen < BUFSIZE ) 
+       && ( forced_M600_inqueue == false ) && ( serial_count == 0 ) ) {
+    forced_M600_inqueue = true;
+    strcpy( cmdbuffer[bufindw], "M600" );
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM("Forced M600 from filament detection");
+    bufindw = (bufindw + 1)%BUFSIZE;
+    buflen += 1;
+    return;
+  }
+#endif
   while( MYSERIAL.available() > 0  && buflen < BUFSIZE) {
     serial_char = MYSERIAL.read();
     if(serial_char == '\n' ||
@@ -785,6 +804,9 @@ void get_command()
     while ( !utility.eof() && buflen < BUFSIZE ) {
       int16_t n=utility.get();
       serial_char = (char)n;
+
+      //SERIAL_ECHO_START;
+      //SERIAL_ECHOLN( serial_char );
 
       if(serial_char == '\n' ||
        serial_char == 0x00 ||
@@ -3108,6 +3130,14 @@ void process_commands()
         plan_buffer_line(lastpos[X_AXIS], lastpos[Y_AXIS], lastpos[Z_AXIS], lastpos[E_AXIS], feedrate/60, active_extruder); //final untretract - should do nothing
         feedrate=old_feedrate;
         lcd_ForceStatusScreen(false);
+
+        #ifdef USE_FILAMENT_DETECTION
+        if ( forced_M600 == true ) {
+          forced_M600 = false;
+          forced_M600_inqueue = false;
+          LCD_MESSAGEPGM(MSG_RESUMING);
+        }
+        #endif
     }
     break;
     #endif //FILAMENTCHANGEENABLE
@@ -3415,6 +3445,30 @@ void get_coordinates()
     }
     else destination[i] = current_position[i]; //Are these else lines really needed?
   }
+
+#ifdef USE_FILAMENT_DETECTION
+  //SERIAL_ECHO_START;
+  //SERIAL_ECHOPGM("Check FILAMENT:");
+  //SERIAL_ECHOLN(buflen);
+
+  static int cmd = 0;
+
+  if ( ( destination[E_AXIS] > current_position[E_AXIS] ) && ( buflen == (BUFSIZE-1) ) ) {
+     // X_MAX_PIN -> 36
+     if ( cmd > 5 ) {
+       if ( ( READ(X_MIN_PIN)==0 ) && ( forced_M600 == false ) ) {
+          SERIAL_ECHO_START;
+          SERIAL_ECHOLNPGM("No FILAMENT");
+          forced_M600 = true;
+       }
+       cmd = 0;
+    }
+    cmd++;
+  } else {
+    cmd = 0;
+  }
+#endif
+
   if(code_seen('F')) {
     next_feedrate = code_value();
     if(next_feedrate > 0.0) feedrate = next_feedrate;

@@ -1463,7 +1463,7 @@
 	#define MSG_NO_CARD              "No SD Card"
 	#define MSG_DWELL                "Sospensione..."
 	#define MSG_USERWAIT             "Attendi Utente..."
-	#define MSG_RESUMING             "Riprendi Stampa"
+	#define MSG_RESUMING             "Ripresa Stampa   "
 	#define MSG_NO_MOVE              "Nessun Movimento."
 	#define MSG_KILLED               "UCCISO. "
 	#define MSG_STOPPED              "ARRESTATO. "
