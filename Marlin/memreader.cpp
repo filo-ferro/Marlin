@@ -51,32 +51,32 @@ MemReader::MemReader()
    pos = 0;
    isprinting = false;
 
-   Script = { NULL,
-                              LEVEL_PLATE_A,
-                              LEVEL_PLATE_M,
-                              CHANGE_RIGHT,
-                              MOVEDOWN,
+   Script[0] = NULL;
+   Script[1] = LEVEL_PLATE_A;
+   Script[2] = LEVEL_PLATE_M;
+   Script[3] = CHANGE_RIGHT;
+   Script[4] = MOVEDOWN;
 #if EXTRUDERS > 1
-                              CHANGE_LEFT,
-                              DUAL
+   Script[5] = CHANGE_LEFT;
+   Script[6] = DUAL;
+   Script[7] = NULL;
 #else
-                              NULL
+   Script[5] = NULL;
 #endif
-};
 
   // Utilities program length
-  ScriptLength = { -1,
-                                     LEVEL_PLATE_A_LENGTH,
-                                     LEVEL_PLATE_M_LENGTH,
-                                     CHANGE_RIGHT_LENGTH,
-                                     MOVEDOWN_LENGTH,
+  ScriptLength[0] = -1;
+  ScriptLength[1] = LEVEL_PLATE_A_LENGTH;
+  ScriptLength[2] = LEVEL_PLATE_M_LENGTH;
+  ScriptLength[3] = CHANGE_RIGHT_LENGTH;
+  ScriptLength[4] = MOVEDOWN_LENGTH;
 #if EXTRUDERS > 1
-                                     CHANGE_LEFT_LENGTH,
-                                     DUAL_LENGTH
+  ScriptLength[5] = CHANGE_LEFT_LENGTH;
+  ScriptLength[6] = DUAL_LENGTH;
+  ScriptLength[7] = -1;
 #else
-                                     -1
+  ScriptLength[5] = -1;
 #endif
-};
 
 }
 
