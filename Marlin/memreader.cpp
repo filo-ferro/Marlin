@@ -10,7 +10,7 @@
 #include "language.h"
 
 #if LANGUAGE_CHOICE == 7
-
+// Italian
 #if MACHINE_3D == 1
 #include "sc_3d_level_plate_a.h"
 #include "sc_3d_level_plate_m.h"
@@ -20,46 +20,56 @@
 #endif
 
 #elif LANGUAGE_CHOICE == 1
-
+// English
 #if MACHINE_3D == 1
-
-#ifdef CFG_MATERIA101
-// MATERIA101 - English
-#include "sc_empty_level_plate_a.h"
-#include "sc_101_level_plate_m_en.h"
-#else
 #include "sc_3d_level_plate_a_en.h"
 #include "sc_3d_level_plate_m_en.h"
-#endif // CFG_MATERIA101
+#endif
 
-#else
-// Default - English
+#ifdef CFG_MATERIA101
+#include "sc_empty_level_plate_a.h"
+#include "sc_101_level_plate_m_en.h"
+#endif
+
+// English: Default
+#ifndef SC_LEVEL_PLATE_A
 #include "sc_level_plate_a_en.h"
+#endif
+
+#ifndef SC_LEVEL_PLATE_M
 #include "sc_level_plate_m_en.h"
 #endif
 
 #else
+// Any other language
 #include "sc_level_plate_a.h"
 #include "sc_level_plate_m.h"
 #endif
 
 #if MACHINE_3D == 1
-
-#ifdef CFG_MATERIA101
-#include "sc_empty_change_left"
-#include "sc_101_change_right"
-#else
 #include "sc_3d_change_left.h"
 #include "sc_3d_change_right.h"
 #endif
 
-#else
+#ifdef CFG_MATERIA101
+#include "sc_empty_change_left.h"
+#include "sc_101_change_right.h"
+#include "sc_empty_movedown.h"
+#endif
+
+#ifndef SC_CHANGE_LEFT
 #include "sc_change_left.h"
+#endif
+
+#ifndef SC_CHANGE_RIGHT
 #include "sc_change_right.h"
 #endif
 
 #include "sc_nozzles.h"
+
+#ifndef SC_MOVEDOWN
 #include "sc_movedown.h"
+#endif
 
 #if EXTRUDERS > 1
 #include "sc_dual.h"

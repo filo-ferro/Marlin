@@ -5,4 +5,4 @@ M117 Move down Z plate
 G90 (set positioning to absolute)
 G1 Z200
 M84
-M117 Sharebot NG
+M117 %PRINTER%

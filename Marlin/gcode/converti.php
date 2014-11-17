@@ -42,31 +42,35 @@ foreach ( $names as $pos=>$name ) {
    		echo "PROGMEM prog_char ".$var_name."[] = {";
 		fwrite ( $fpw, "PROGMEM prog_char ".$var_name."[] = {" );
   	 	while ( !feof($fp) ) {
-      			$c = fgetc($fp);
-                        if ( $c == ';' ) { 
-                           $comment = TRUE;
-                        }
-                        if ( $c == "\n" ) {
-                           $comment = FALSE;
-                           /* Se ci sono due righe vuote non salva la seconda */
-                           if ( $cnt_riga == 0 )
-                              continue;
-                           $cnt_riga=-1;
-                        }
-                        if ( ( $comment ) || ( $c == "\r" ) || ( ord($c) == 0x00 ) )
-                           continue;
-      			$cnt++;
-                        $cnt_riga++;
-                        $last=$c;
-      			if ( $cnt == 1 )
-         			$first=false;
-      			else {
-         			#echo ",";
-				fwrite ( $fpw, "," );
+                        $line = fgets( $fp );
+                        $line = str_replace( "%PRINTER%", "Sharebot NG     ", $line );
+                        for( $idx = 0; $idx<strlen($line); $idx++ ) {
+      				$c = $line[$idx];
+                        	if ( $c == ';' ) { 
+                           		$comment = TRUE;
+                        	}	
+                        	if ( $c == "\n" ) {
+                        		$comment = FALSE;
+                           		/* Se ci sono due righe vuote non salva la seconda */
+                           		if ( $cnt_riga == 0 )
+                        			continue;
+                           		$cnt_riga=-1;
+                        	}
+                        	if ( ( $comment ) || ( $c == "\r" ) || ( ord($c) == 0x00 ) )
+                           		continue;
+      				$cnt++;
+                        	$cnt_riga++;
+                        	$last=$c;
+      				if ( $cnt == 1 )
+         				$first=false;
+      				else {
+         				#echo ",";
+					fwrite ( $fpw, "," );
+				}
+      				#echo ord($c);
+                        	echo $c;
+				fwrite ( $fpw, ord($c) );
 			}
-      			#echo ord($c);
-                        echo $c;
-			fwrite ( $fpw, ord($c) );
    		}
 
                 // Se l'ultima riga non termina con LF lo aggiunge
