@@ -1,6 +1,8 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#include "Configuration.h"
+
 // NOTE: IF YOU CHANGE THIS FILE / MERGE THIS FILE WITH CHANGES
 //
 //   ==> ALWAYS TRY TO COMPILE MARLIN WITH/WITHOUT "ULTIPANEL" / "ULTRALCD" / "SDSUPPORT" #define IN "Configuration.h" 
@@ -32,6 +34,12 @@
 #if MACHINE_3D == 1
 #define MACHINE_NAME "3D Printer"
 #define FIRMWARE_URL "http://www.google.it"
+#endif
+
+#ifdef CFG_MATERIA101
+#define MACHINE_NAME "MATERIA 101     "
+#define FIRMWARE_URL "http://www.arduino.cc"
+#define LANGUAGE_CHOICE 1
 #endif
 
 #if MOTHERBOARD == 34 || MOTHERBOARD == 34

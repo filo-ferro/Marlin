@@ -10,6 +10,7 @@
 #include "language.h"
 
 #if LANGUAGE_CHOICE == 7
+
 #if MACHINE_3D == 1
 #include "sc_3d_level_plate_a.h"
 #include "sc_3d_level_plate_m.h"
@@ -17,22 +18,41 @@
 #include "sc_level_plate_a.h"
 #include "sc_level_plate_m.h"
 #endif
+
 #elif LANGUAGE_CHOICE == 1
+
 #if MACHINE_3D == 1
+
+#ifdef CFG_MATERIA101
+// MATERIA101 - English
+#include "sc_empty_level_plate_a.h"
+#include "sc_101_level_plate_m_en.h"
+#else
 #include "sc_3d_level_plate_a_en.h"
 #include "sc_3d_level_plate_m_en.h"
+#endif // CFG_MATERIA101
+
 #else
+// Default - English
 #include "sc_level_plate_a_en.h"
 #include "sc_level_plate_m_en.h"
 #endif
+
 #else
 #include "sc_level_plate_a.h"
 #include "sc_level_plate_m.h"
 #endif
 
 #if MACHINE_3D == 1
+
+#ifdef CFG_MATERIA101
+#include "sc_empty_change_left"
+#include "sc_101_change_right"
+#else
 #include "sc_3d_change_left.h"
 #include "sc_3d_change_right.h"
+#endif
+
 #else
 #include "sc_change_left.h"
 #include "sc_change_right.h"

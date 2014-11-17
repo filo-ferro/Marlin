@@ -629,7 +629,9 @@ static void lcd_prepare_menu()
     }
 #endif
     MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
+#ifndef CFG_MATERIA101
     MENU_ITEM(function, MSG_PLATE_LEVEL_A, lcd_ut_level_plate_a);
+#endif
     MENU_ITEM(function, MSG_PLATE_LEVEL_M, lcd_ut_level_plate_m);
     MENU_ITEM(function, MSG_MOVEDOWN, lcd_ut_movedown);
 #if EXTRUDERS > 1
@@ -1053,7 +1055,9 @@ void lcd_sdprint_settings()
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(submenu, MSG_PRINT_GCODE, lcd_sdprint_none );
     MENU_ITEM(submenu, "PLA", lcd_sdprint_pla );
+#ifndef CFG_MATERIA101
     MENU_ITEM(submenu, "ABS", lcd_sdprint_abs );
+#endif
     END_MENU();
 }
 
