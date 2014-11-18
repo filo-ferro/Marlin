@@ -10,8 +10,8 @@
 
 #ifdef CFG_MATERIA101
 #undef CONFIGURATION_H
-#include <cfg_materia101.h>
-#include <cfg_materia101_adv.h>
+#include "cfg_materia101.h"
+#include "cfg_materia101_adv.h"
 
 #else
 // Default: Marlin configuration
