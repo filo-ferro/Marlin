@@ -27,8 +27,8 @@
 #endif
 
 #ifdef CFG_MATERIA101
-#include "sc_empty_level_plate_a.h"
-#include "sc_101_level_plate_m_en.h"
+#include "sc_101_level_plate_a_en.h"
+#include "sc_empty_level_plate_m.h"
 #endif
 
 // English: Default

@@ -629,11 +629,9 @@ static void lcd_prepare_menu()
     }
 #endif
     MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
-#ifndef CFG_MATERIA101
     MENU_ITEM(function, MSG_PLATE_LEVEL_A, lcd_ut_level_plate_a);
-#endif
-    MENU_ITEM(function, MSG_PLATE_LEVEL_M, lcd_ut_level_plate_m);
 #ifndef CFG_MATERIA101
+    MENU_ITEM(function, MSG_PLATE_LEVEL_M, lcd_ut_level_plate_m);
     MENU_ITEM(function, MSG_MOVEDOWN, lcd_ut_movedown);
 #endif
 #if EXTRUDERS > 1
