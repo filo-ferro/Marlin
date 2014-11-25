@@ -777,6 +777,10 @@ void get_command()
            }
 
            SERIAL_ECHOPGM(";");
+           SERIAL_ECHO(ftostr32(current_position[X_AXIS]));
+           SERIAL_ECHOPGM(";");
+           SERIAL_ECHO(ftostr32(current_position[Y_AXIS]));
+           SERIAL_ECHOPGM(";");
            SERIAL_ECHO(ftostr32(current_position[Z_AXIS]));
            SERIAL_ECHOPGM(";");
            SERIAL_ECHOLN(itostr3(feedmultiply));
