@@ -455,7 +455,7 @@ static void lcd_tune_menu()
     MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
 #endif
 #ifdef FILAMENTCHANGEENABLE
-    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600"));
+    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X220 Y200"));
 #endif
     END_MENU();
 }
@@ -636,8 +636,8 @@ static void lcd_prepare_menu()
 #endif
 #if EXTRUDERS > 1
     if ( card.printingpaused ) {
-        MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600 T0"));
-        MENU_ITEM(gcode, MSG_CHANGE_LEFT, PSTR("M600 T1"));
+        MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600 T0 X220 Y200"));
+        MENU_ITEM(gcode, MSG_CHANGE_LEFT, PSTR("M600 T1 X220 Y200"));
     } else {
         MENU_ITEM(function, MSG_CHANGE_RIGHT, lcd_ut_change_right);
         MENU_ITEM(function, MSG_CHANGE_LEFT, lcd_ut_change_left);
@@ -645,7 +645,7 @@ static void lcd_prepare_menu()
     MENU_ITEM(function, MSG_DUAL_CALIBRATION, lcd_ut_dual);
 #else
     if ( card.printingpaused ) {
-        MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600"));
+        MENU_ITEM(gcode, MSG_CHANGE_RIGHT, PSTR("M600 X220 Y200"));
     } else {
         MENU_ITEM(function, MSG_CHANGE_SINGLE, lcd_ut_change_right);
     }

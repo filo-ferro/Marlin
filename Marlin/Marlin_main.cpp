@@ -3035,7 +3035,7 @@ void process_commands()
         //move xy
         if(code_seen('X'))
         {
-          target[X_AXIS]+= code_value();
+          target[X_AXIS] = code_value();
         }
         else
         {
@@ -3045,7 +3045,7 @@ void process_commands()
         }
         if(code_seen('Y'))
         {
-          target[Y_AXIS]= code_value();
+          target[Y_AXIS] = code_value();
         }
         else
         {
