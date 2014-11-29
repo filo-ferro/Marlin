@@ -1269,6 +1269,45 @@ static void homeaxis(int axis) {
         servos[servo_endstops[axis]].write(servo_endstop_angles[axis * 2 + 1]);
       }
     #endif
+#if defined(Z_DUAL_STEPPER_DRIVERS) && defined(Z2_STEP_PIN) && (Z2_STEP_PIN > -1)
+     if (axis == Z_AXIS) {
+       #if Z_HOME_DIR == 1
+         #define HOME_Z_DUAL_COND ( (READ(Z_MAX_PIN)==1) || (READ(Z2_MAX_PIN)==1) )
+         #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+       #else
+         #define HOME_Z_DUAL_COND ( (READ(Z_MIN_PIN)==1) || (READ(Z2_MIN_PIN)==1) )
+         #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+       #endif
+       while ( HOME_Z_DUAL_COND ) {
+          int i;
+ 
+          manage_heater();
+          manage_inactivity();
+          lcd_update();
+          if ( (READ(Z_MIN_PIN))==1 ) {
+            WRITE(Z_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
+             for ( i=0; i<400; i++ ) {
+                delay(1); 
+                WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN);
+                WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
+             }
+          }
+          
+          manage_heater();
+          manage_inactivity();
+          lcd_update();
+          if ( (READ(Z2_MIN_PIN))==1 ) {
+            WRITE(Z2_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
+            for ( i=0; i<400; i++) {
+              delay(1); 
+              WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
+              WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
+            }
+          }
+       }
+     }
+#endif
+
 #if defined (ENABLE_AUTO_BED_LEVELING) && (PROBE_SERVO_DEACTIVATION_DELAY > 0)
     if (axis==Z_AXIS) retract_z_probe();
 #endif
@@ -3256,40 +3295,42 @@ void process_commands()
     break;
 
     case 997: // Allineamento degli assi Z manda un impulso su ciscun asse finche' non raggiungere i fine corsa
-      // Direzione +
 #if defined(Z_DUAL_STEPPER_DRIVERS) && defined(Z2_STEP_PIN) && (Z2_STEP_PIN > -1)
       enable_z();
-      
-      while ( (READ(Z_MAX_PIN)==1) || (READ(Z2_MAX_PIN)==1) ) {
-         int i;
 
-         manage_heater();
-          manage_inactivity();
-          lcd_update();
-         //SERIAL_ECHO("P"); 
-         //SERIAL_ECHO(READ(32));
-         if ( (READ(Z_MAX_PIN))==1 ) {
-           WRITE(Z_DIR_PIN,!INVERT_Z_DIR);
-            for ( i=0; i<400; i++ ) {
-               delay(1);
-               WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN);
-               WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
-            }
-         }
-         
-         manage_heater();
-          manage_inactivity();
-          lcd_update();
-         //SERIAL_ECHO("S");
-         //SERIAL_ECHO(READ(34));
-         if ( (READ(Z2_MAX_PIN))==1 ) {
-           WRITE(Z2_DIR_PIN,!INVERT_Z_DIR);
-            for ( i=0; i<400; i++) {
-               delay(1);
-               WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
-               WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
-            }
-         }
+      #if Z_HOME_DIR == 1
+        #define HOME_Z_DUAL_COND ( (READ(Z_MAX_PIN)==1) || (READ(Z2_MAX_PIN)==1) )
+        #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+      #else
+        #define HOME_Z_DUAL_COND ( (READ(Z_MIN_PIN)==1) || (READ(Z2_MIN_PIN)==1) )
+        #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+      #endif
+      while ( HOME_Z_DUAL_COND ) {
+        int i;
+
+        manage_heater();
+        manage_inactivity();
+        lcd_update();
+        if ( (READ(Z_MIN_PIN))==1 ) {
+          WRITE(Z_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
+           for ( i=0; i<400; i++ ) {
+              delay(1);
+              WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN);
+              WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
+           }
+        }
+
+        manage_heater();
+        manage_inactivity();
+        lcd_update();
+        if ( (READ(Z2_MIN_PIN))==1 ) {
+          WRITE(Z2_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
+          for ( i=0; i<400; i++) {
+            delay(1);
+            WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
+            WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
+          }
+        }
       }
 #endif
     break;
