@@ -154,6 +154,11 @@ int watch_start_temp[EXTRUDERS] = ARRAY_BY_EXTRUDERS(0,0,0);
 unsigned long watchmillis[EXTRUDERS] = ARRAY_BY_EXTRUDERS(0,0,0);
 #endif //WATCH_TEMP_PERIOD
 
+#ifdef HEATER_0_USES_MLX90614
+static float mlx_temp=20.0;
+#include "mlx90614.h"
+#endif
+
 #ifndef SOFT_PWM_SCALE
 #define SOFT_PWM_SCALE 0
 #endif
@@ -593,6 +598,10 @@ void manage_heater()
       }
     #endif
   #endif
+
+  #ifdef HEATER_0_USES_MLX90614
+  mlx_temp=mlx90614_i2c_readT();
+  #endif
 }
 
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
@@ -616,6 +625,11 @@ static float analog2temp(int raw, uint8_t e) {
     {
       return 0.25 * raw;
     }
+  #endif
+  #ifdef HEATER_0_USES_MLX90614
+  if ( e == 0 ) {
+    return 0.1 * raw;
+  }
   #endif
 
   if(heater_ttbl_map[e] != NULL)
@@ -886,6 +900,10 @@ void tp_init()
 #endif
   }
 #endif //BED_MAXTEMP
+
+#ifdef HEATER_0_USES_MLX90614
+  mlx90614_i2c_init();
+#endif
 }
 
 void setWatch() 
@@ -1145,6 +1163,9 @@ ISR(TIMER0_COMPB_vect)
       #endif
       #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
         raw_temp_0_value = read_max6675();
+      #endif
+      #ifdef HEATER_0_USES_MLX90614
+        raw_temp_0_value = mlx_temp*10;
       #endif
       temp_state = 2;
       break;
