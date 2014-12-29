@@ -582,9 +582,7 @@
   #else
     #define FAN_PIN            4 // IO pin. Buffer needed
     #define FAN_PIN2           5 // IO pin. Buffer needed
-    #ifndef CFG_MATERIA101
-      #define FAN_TO_FAN2          // If enabled FAN_PIN2 acts exactly like FAN_PIN
-    #endif
+    #define FAN_TO_FAN2          // If enabled FAN_PIN2 acts exactly like FAN_PIN
   #endif
 
   #if MOTHERBOARD == 77
@@ -1544,19 +1542,23 @@
 #define X_DIR_PIN          16
 #define X_ENABLE_PIN       48
 #define X_MIN_PIN          37
-#define X_MAX_PIN          36
+#define X_MAX_PIN          -1 // Era 36 ora per pausa scorrimento filo
 
 #define Y_STEP_PIN         54
 #define Y_DIR_PIN          47
 #define Y_ENABLE_PIN       55
 #define Y_MIN_PIN          35
-#define Y_MAX_PIN          34
+#define Y_MAX_PIN          -1 // Era 34 ma e' quello di Z2_MAX
 
 #define Z_STEP_PIN         57
 #define Z_DIR_PIN          56
 #define Z_ENABLE_PIN       62
 #define Z_MIN_PIN          33
 #define Z_MAX_PIN          32
+
+#define Z2_STEP_PIN        29
+#define Z2_DIR_PIN         28
+#define Z2_ENABLE_PIN      39
 
 #define E0_STEP_PIN        23
 #define E0_DIR_PIN         22
@@ -1587,7 +1589,7 @@
  #if (TEMP_SENSOR_0==-1)
   #define TEMP_0_PIN         6    // ANALOG NUMBERING - connector *K1* on RUMBA thermocouple ADD ON is used
  #else
-  #define TEMP_0_PIN         15   // ANALOG NUMBERING - default connector for thermistor *T0* on rumba board is used
+  #define TEMP_0_PIN         14   // ANALOG NUMBERING - default connector for thermistor *T0* on rumba board is used
  #endif
 #endif 
 

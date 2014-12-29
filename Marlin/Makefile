@@ -349,12 +349,12 @@ ifneq ($(EXTRUDERS),)
 CTUNING += -DEXTRUDERS=${EXTRUDERS}
 endif
 #CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
-CEXTRA = -fno-use-cxa-atexit
+CEXTRA = -fno-use-cxa-atexit -mrelax
 
 CFLAGS := $(CDEBUG) $(CDEFS) $(CINCS) -O$(OPT) $(CWARN) $(CEXTRA) $(CTUNING)
 CXXFLAGS :=         $(CDEFS) $(CINCS) -O$(OPT) -Wall    $(CEXTRA) $(CTUNING)
 #ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
-LDFLAGS = -lm
+LDFLAGS = -lm --relax
 
 
 # Programming support using avrdude. Settings and variables.

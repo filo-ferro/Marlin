@@ -270,7 +270,9 @@ static void lcd_sdcard_stop()
 
     enquecommand_P((PSTR("G0 Z200 F1000")));
     enquecommand_P((PSTR("G28 X Y"))); // move all axis home
-    enquecommand_P((PSTR("M106 S0")));
+    // Only 3 commands can be buffered
+    //enquecommand_P((PSTR("M106 S0")));
+    fanSpeed = 0;
 
     if(SD_FINISHED_STEPPERRELEASE)
     {
@@ -1508,6 +1510,13 @@ void lcd_buttons_update()
   #if BTN_ENC > 0
     if((blocking_enc<millis()) && (READ(BTN_ENC)==0))
         newbutton |= EN_C;
+    #define USE_EXTERNAL_CLICK
+    #ifdef USE_EXTERNAL_CLICK
+    #define EXT_CLICK_PIN 30
+    if ( (blocking_enc<millis()) && (READ(EXT_CLICK_PIN)==0) ) {
+           newbutton |= EN_C;
+    }
+    #endif
   #endif
     buttons = newbutton;
     #ifdef LCD_HAS_SLOW_BUTTONS

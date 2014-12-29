@@ -301,6 +301,8 @@ boolean forced_M600 = false;
 boolean forced_M600_inqueue = false;
 #endif
 
+#define USE_EXTERNAL_CLICK
+
 //===========================================================================
 //=============================Private Variables=============================
 //===========================================================================
@@ -565,8 +567,75 @@ void setup()
   #ifdef DIGIPOT_I2C
     digipot_i2c_init();
   #endif
+
+  #ifdef USE_EXTERNAL_CLICK
+  pinMode(30,INPUT);
+  WRITE(30,HIGH);
+  #endif
 }
 
+void sendM613Status( bool ok )
+{
+   int level;
+
+   SERIAL_ECHO_START;
+   SERIAL_ECHOPGM("M613");
+   SERIAL_ECHO(lcd_getstatus(&level));
+   SERIAL_ECHO(";");
+   SERIAL_ECHO(level);
+#if EXTRUDERS > 0
+   SERIAL_ECHOPGM(";0:");
+   SERIAL_ECHO(int(degHotend(0) + 0.5 ));
+   SERIAL_ECHOPGM("/");
+   SERIAL_ECHO(int(degTargetHotend(0) + 0.5 ));
+#endif
+#if EXTRUDERS > 1
+   SERIAL_ECHOPGM(";1:");
+   SERIAL_ECHO(int(degHotend(0) + 0.5 ));
+   SERIAL_ECHOPGM("/");
+   SERIAL_ECHO(int(degTargetHotend(0) + 0.5 ));
+#endif
+#if TEMP_SENSOR_BED != 0
+   SERIAL_ECHOPGM(";B:");
+   SERIAL_ECHO(int(degBed() + 0.5 ));
+   SERIAL_ECHOPGM("/");
+   SERIAL_ECHO(int(degTargetBed() + 0.5 ));
+#endif
+
+   if (IS_SD_PRINTING) {
+      SERIAL_ECHOPGM(";");
+      SERIAL_ECHO(itostr3(card.percentDone()));
+   } else {
+      SERIAL_ECHOPGM(";-1");
+   }
+
+   SERIAL_ECHOPGM(";");
+   SERIAL_ECHO(ftostr32(current_position[X_AXIS]));
+   SERIAL_ECHOPGM(";");
+   SERIAL_ECHO(ftostr32(current_position[Y_AXIS]));
+   SERIAL_ECHOPGM(";");
+   SERIAL_ECHO(ftostr32(current_position[Z_AXIS]));
+   SERIAL_ECHOPGM(";");
+   SERIAL_ECHOLN(itostr3(feedmultiply));
+   if ( ok ) {
+      SERIAL_ECHOLNPGM("ok");
+   }
+}
+
+void sendM613Click( bool request )
+{
+   int level;
+
+   SERIAL_ECHO_START;
+   SERIAL_ECHOPGM("M613");
+   SERIAL_ECHO(lcd_getstatus(&level));
+   SERIAL_ECHO(";");
+   SERIAL_ECHO(level);
+   if ( request ) 
+      SERIAL_ECHOLNPGM(";C:1");
+   else
+      SERIAL_ECHOLNPGM(";C:0");
+}
 
 void loop()
 {
@@ -1273,10 +1342,14 @@ static void homeaxis(int axis) {
      if (axis == Z_AXIS) {
        #if Z_HOME_DIR == 1
          #define HOME_Z_DUAL_COND ( (READ(Z_MAX_PIN)==1) || (READ(Z2_MAX_PIN)==1) )
-         #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+         #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+         #define HOME_Z_COND (READ(Z_MAX_PIN))
+         #define HOME_Z2_COND (READ(Z2_MAX_PIN))
        #else
          #define HOME_Z_DUAL_COND ( (READ(Z_MIN_PIN)==1) || (READ(Z2_MIN_PIN)==1) )
-         #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+         #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+         #define HOME_Z_COND (READ(Z_MIN_PIN))
+         #define HOME_Z2_COND (READ(Z2_MIN_PIN))
        #endif
        while ( HOME_Z_DUAL_COND ) {
           int i;
@@ -1284,7 +1357,7 @@ static void homeaxis(int axis) {
           manage_heater();
           manage_inactivity();
           lcd_update();
-          if ( (READ(Z_MIN_PIN))==1 ) {
+          if ( HOME_Z_COND==1 ) {
             WRITE(Z_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
              for ( i=0; i<400; i++ ) {
                 delay(1); 
@@ -1296,7 +1369,7 @@ static void homeaxis(int axis) {
           manage_heater();
           manage_inactivity();
           lcd_update();
-          if ( (READ(Z2_MIN_PIN))==1 ) {
+          if ( HOME_Z2_COND==1 ) {
             WRITE(Z2_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
             for ( i=0; i<400; i++) {
               delay(1); 
@@ -1426,7 +1499,7 @@ void process_commands()
       #endif //FWRETRACT
     case 28: //G28 Home all Axis one at a time
 #ifdef ENABLE_AUTO_BED_LEVELING
-      //plan_bed_level_matrix.set_to_identity();  //Reset the plane ("erase" all leveling data)
+      plan_bed_level_matrix.set_to_identity();  //Reset the plane ("erase" all leveling data)
 #endif //ENABLE_AUTO_BED_LEVELING
 
 
@@ -2222,6 +2295,9 @@ void process_commands()
             #else
               SERIAL_PROTOCOLLN("");
             #endif
+            #ifdef USE_EXTERNAL_CLICK
+            sendM613Status( false );
+            #endif
             codenum = millis();
           }
           manage_heater();
@@ -2278,6 +2354,9 @@ void process_commands()
             SERIAL_PROTOCOLPGM(" B:");
             SERIAL_PROTOCOL_F(degBed(),1);
             SERIAL_PROTOCOLLN("");
+            #ifdef USE_EXTERNAL_CLICK
+            sendM613Status( false );
+            #endif
             codenum = millis();
           }
           manage_heater();
@@ -3117,6 +3196,9 @@ void process_commands()
         delay(100);
         LCD_MESSAGEPGM(MSG_FILAMENTCHANGE);
         lcd_ForceStatusScreen(true);
+#ifdef USE_EXTERNAL_CLICK
+        sendM613Click( true );
+#endif
         uint8_t cnt=0;
         while(!lcd_clicked()){
           cnt++;
@@ -3141,6 +3223,10 @@ void process_commands()
           #endif
           }
         }
+#ifdef USE_EXTERNAL_CLICK
+        sendM613Click( false );
+#endif
+
 
         // Wait until the button is not clicked
         while(lcd_clicked()){
@@ -3151,6 +3237,9 @@ void process_commands()
        
         delay(500); 
         LCD_MESSAGEPGM(MSG_LOAD_SINGLE);
+#ifdef USE_EXTERNAL_CLICK
+        sendM613Click( true );
+#endif
         // Extrude until the button is clicked
         while(!lcd_clicked()){
           manage_heater();
@@ -3161,7 +3250,9 @@ void process_commands()
           plan_buffer_line(target[X_AXIS], target[Y_AXIS], target[Z_AXIS], target[E_AXIS], feedrate/100, active_extruder);
 
         }
-
+#ifdef USE_EXTERNAL_CLICK
+        sendM613Click( false );
+#endif
         // E axis is handled directly by the user so reset it to the actual position
         target[E_AXIS]=lastpos[E_AXIS];
         current_position[E_AXIS]=target[E_AXIS];
@@ -3300,10 +3391,14 @@ void process_commands()
 
       #if Z_HOME_DIR == 1
         #define HOME_Z_DUAL_COND ( (READ(Z_MAX_PIN)==1) || (READ(Z2_MAX_PIN)==1) )
-        #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+        #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+        #define HOME_Z_COND (READ(Z_MAX_PIN))
+        #define HOME_Z2_COND (READ(Z2_MAX_PIN))
       #else
         #define HOME_Z_DUAL_COND ( (READ(Z_MIN_PIN)==1) || (READ(Z2_MIN_PIN)==1) )
-        #define HOME_Z_DUAL_DIR_PIN !INVERT_Z_DIR
+        #define HOME_Z_DUAL_DIR_PIN INVERT_Z_DIR
+        #define HOME_Z_COND (READ(Z_MAX_PIN))
+        #define HOME_Z2_COND (READ(Z2_MAX_PIN))
       #endif
       while ( HOME_Z_DUAL_COND ) {
         int i;
@@ -3311,7 +3406,7 @@ void process_commands()
         manage_heater();
         manage_inactivity();
         lcd_update();
-        if ( (READ(Z_MIN_PIN))==1 ) {
+        if ( HOME_Z_COND==1 ) {
           WRITE(Z_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
            for ( i=0; i<400; i++ ) {
               delay(1);
@@ -3323,7 +3418,7 @@ void process_commands()
         manage_heater();
         manage_inactivity();
         lcd_update();
-        if ( (READ(Z2_MIN_PIN))==1 ) {
+        if ( HOME_Z2_COND==1 ) {
           WRITE(Z2_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
           for ( i=0; i<400; i++) {
             delay(1);
