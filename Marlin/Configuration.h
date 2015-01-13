@@ -9,7 +9,7 @@
 // 0 - DEFAULT
 // 1 - CFG_MATERIA101
 // 2 - SHAREBOT Q
-#define SPEC_CFG 2
+#define SPEC_CFG 0
 
 #if SPEC_CFG == 1
 #undef CONFIGURATION_H

@@ -11,7 +11,7 @@
 static float mlx90614_i2c_readT( void )
 {
    static unsigned long lastRead=0;
-   static float temp;
+   static float temp=20.0;
    uint16_t ret=0;
    uint8_t pec;
 
@@ -25,10 +25,12 @@ static float mlx90614_i2c_readT( void )
       ret |= Wire.read() << 8; // receive DATA
 
       pec = Wire.read();
-
-      temp=ret*0.02-273.15;
+      // Valid range is from -70 to 380
+      if ( ( ret > 10000 ) && ( ret <= 32768 ) ) {
+         temp=ret*0.02-273.15;
+      }
    }
-      
+
    return temp;
 }
 
