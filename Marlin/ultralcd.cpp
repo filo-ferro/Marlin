@@ -1510,9 +1510,7 @@ void lcd_buttons_update()
   #if BTN_ENC > 0
     if((blocking_enc<millis()) && (READ(BTN_ENC)==0))
         newbutton |= EN_C;
-    #define USE_EXTERNAL_CLICK
     #ifdef USE_EXTERNAL_CLICK
-    #define EXT_CLICK_PIN 30
     if ( (blocking_enc<millis()) && (READ(EXT_CLICK_PIN)==0) ) {
            newbutton |= EN_C;
     }

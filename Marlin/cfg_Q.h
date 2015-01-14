@@ -20,6 +20,9 @@
 #define MACHINE_NAME "SHAREBOT Q"
 #define FIRMWARE_URL "http://www.sharebot.it"
 
+#define USE_EXTERNAL_CLICK
+#define EXT_CLICK_PIN 30
+
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
 // Serial port 0 is still used by the Arduino bootloader regardless of this setting.

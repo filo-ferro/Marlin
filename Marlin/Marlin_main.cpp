@@ -301,8 +301,6 @@ boolean forced_M600 = false;
 boolean forced_M600_inqueue = false;
 #endif
 
-#define USE_EXTERNAL_CLICK
-
 //===========================================================================
 //=============================Private Variables=============================
 //===========================================================================
@@ -569,8 +567,8 @@ void setup()
   #endif
 
   #ifdef USE_EXTERNAL_CLICK
-  pinMode(30,INPUT);
-  WRITE(30,HIGH);
+  pinMode(EXT_CLICK_PIN,INPUT);
+  WRITE(EXT_CLICK_PIN,HIGH);
   #endif
 }
 
