@@ -158,6 +158,8 @@
 // 110 is Pt100 with 1k pullup (non standard)
 // 70 is 500C thermistor for Pico hot end
 
+#define USE_FILAMENT_DETECTION
+
 #if EXTRUDERS == 1
 
  #define TEMP_SENSOR_0 1

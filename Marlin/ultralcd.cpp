@@ -652,6 +652,12 @@ static void lcd_prepare_menu()
         MENU_ITEM(function, MSG_CHANGE_SINGLE, lcd_ut_change_right);
     }
 #endif
+
+#ifdef USE_FILAMENT_DETECTION
+    #define MSG_FILAMENT_DETECTION "Check fil."
+    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+#endif
+
     END_MENU();
 }
 

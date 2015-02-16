@@ -288,17 +288,17 @@ int EtoPPressure=0;
 bool cancel_heatup = false ;
 
 // Force parameters for beginners
-boolean force_temp = false;
+bool force_temp = false;
 float forced_M104;
 float forced_M106;
 float forced_M109;
 float forced_M190;
 
-//#define USE_FILAMENT_DETECTION
 // Forced filament change from filament detection
 #ifdef USE_FILAMENT_DETECTION
-boolean forced_M600 = false;
-boolean forced_M600_inqueue = false;
+bool forced_M600 = false;
+bool forced_M600_inqueue = false;
+bool detect_filament = true;
 #endif
 
 //===========================================================================
@@ -3591,7 +3591,7 @@ void get_coordinates()
 
   static int cmd = 0;
 
-  if ( ( destination[E_AXIS] > current_position[E_AXIS] ) && ( buflen == (BUFSIZE-1) ) ) {
+  if ( detect_filament && ( destination[E_AXIS] > current_position[E_AXIS] ) && ( buflen == (BUFSIZE-1) ) ) {
      // X_MAX_PIN -> 36
      if ( cmd > 5 ) {
        if ( ( READ(X_MIN_PIN)==0 ) && ( forced_M600 == false ) ) {
