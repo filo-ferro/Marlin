@@ -459,6 +459,9 @@ static void lcd_tune_menu()
 #ifdef FILAMENTCHANGEENABLE
     MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X220 Y200"));
 #endif
+#ifdef USE_FILAMENT_DETECTION
+    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+#endif
     END_MENU();
 }
 
@@ -654,7 +657,6 @@ static void lcd_prepare_menu()
 #endif
 
 #ifdef USE_FILAMENT_DETECTION
-    #define MSG_FILAMENT_DETECTION "Check fil."
     MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
 #endif
 
