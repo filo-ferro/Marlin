@@ -4,6 +4,7 @@
 #include "ultralcd.h"
 #include "language.h"
 #include "ConfigurationStore.h"
+#include "Hysteresis.h"
 
 #if EXTRUDERS > 1
 extern float extruder_offset[2][2];
@@ -119,6 +120,13 @@ void Config_StoreSettings()
   EEPROM_WRITE_VAR( i, dummy );
 #endif
 
+  float x, y, z, e;
+  hysteresis.Get( &x, &y, &z, &e );
+  EEPROM_WRITE_VAR( i, x );
+  EEPROM_WRITE_VAR( i, y );
+  EEPROM_WRITE_VAR( i, z );
+  EEPROM_WRITE_VAR( i, e );
+ 
   char ver2[4]=EEPROM_VERSION;
   i=EEPROM_OFFSET;
   EEPROM_WRITE_VAR(i,ver2); // validate data
@@ -198,6 +206,9 @@ void Config_PrintSettings()
     SERIAL_ECHOPAIR(" Y" ,extruder_offset[Y_AXIS][1] );
     SERIAL_ECHOLN("");
 #endif
+
+    SERIAL_ECHO_START;
+    hysteresis.ReportToSerial();
 
 #ifdef DELTA
     SERIAL_ECHO_START;
@@ -305,6 +316,17 @@ void Config_RetrieveSettings()
             EEPROM_READ_VAR(i, ofdmy );
             EEPROM_READ_VAR(i, ofdmy );
 #endif
+
+            float m99;
+            EEPROM_READ_VAR( i, m99 );
+            hysteresis.SetAxis( X_AXIS, m99 );
+            EEPROM_READ_VAR( i, m99 );
+            hysteresis.SetAxis( Y_AXIS, m99 );
+            EEPROM_READ_VAR( i, m99 );
+            hysteresis.SetAxis( Z_AXIS, m99 );
+            EEPROM_READ_VAR( i, m99 );
+            hysteresis.SetAxis( E_AXIS, m99 );
+
             SERIAL_ECHO_START;
 #if MACHINE_3D != 1
             SERIAL_ECHOLNPGM("Sharebot stored settings retrieved");
