@@ -410,6 +410,9 @@ void Config_ResetDefault()
     extruder_offset[X_AXIS][1]=0.0f;
     extruder_offset[Y_AXIS][1]=0.0f;
 #endif
+
+    hysteresis.Set( 0.0f, 0.0f, 0.0f, 0.0f );
+
 SERIAL_ECHO_START;
 SERIAL_ECHOLNPGM("Hardcoded Default Settings Loaded");
 
