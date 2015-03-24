@@ -46,7 +46,7 @@ void _EEPROM_readData(int &pos, uint8_t* value, uint8_t size)
 #ifdef DELTA
 #define EEPROM_VERSION "V11"
 #else
-#define EEPROM_VERSION "V10"
+#define EEPROM_VERSION "S10"
 #endif
 
 #ifdef EEPROM_SETTINGS
