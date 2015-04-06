@@ -522,6 +522,10 @@ void manage_heater()
     extruder_autofan_last_check = millis();
   }  
   #endif       
+
+  #ifdef HEATER_0_USES_MLX90614
+  mlx_temp=mlx90614_i2c_readT();
+  #endif
   
   #ifndef PIDTEMPBED
   if(millis() - previous_millis_bed_heater < BED_CHECK_INTERVAL)
@@ -599,9 +603,6 @@ void manage_heater()
     #endif
   #endif
 
-  #ifdef HEATER_0_USES_MLX90614
-  mlx_temp=mlx90614_i2c_readT();
-  #endif
 }
 
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
