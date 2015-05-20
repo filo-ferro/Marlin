@@ -49,6 +49,7 @@
 #include "pins_arduino.h"
 #include "Hysteresis.h"
 #include "math.h"
+#include "lifetime_stats.h"
 
 #ifdef BLINKM
 #include "BlinkM.h"
@@ -183,9 +184,6 @@
 //===========================================================================
 //=============================imported variables============================
 //===========================================================================
-#ifdef SBT_DEBUG
-char cbufdmy[128];
-#endif
 
 
 //===========================================================================
@@ -570,6 +568,8 @@ void setup()
   pinMode(EXT_CLICK_PIN,INPUT);
   WRITE(EXT_CLICK_PIN,HIGH);
   #endif
+
+  lifetime_stats_init();
 }
 
 void sendM613Status( bool ok )
@@ -680,6 +680,7 @@ void loop()
   manage_inactivity();
   checkHitEndstops();
   lcd_update();
+  lifetime_stats_tick();
 }
 
 void get_command()
@@ -908,14 +909,6 @@ void get_command()
       }
     }
 
-#ifdef SBT_DEBUG
-    if ( serial_count!=0) {
-      sprintf(cbufdmy, "Incomplete line:'%s'", cmdbuffer[bufindw]);
-      SERIAL_ECHO_START;
-      SERIAL_ECHOLN(cbufdmy);
-      serial_count=0;
-    }
-#endif
   }
 
   #ifdef SDSUPPORT
@@ -3434,6 +3427,14 @@ void process_commands()
       gcode_LastN = Stopped_gcode_LastN;
       FlushSerialRequestResend();
     break;
+
+    case 2000: // M2000: Print lifetime stats
+      if(code_seen('R')) {
+        reset_triptime();
+      }
+      print_lifetime_stats();
+      break;
+
     }
   }
 

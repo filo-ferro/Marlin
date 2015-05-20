@@ -264,7 +264,7 @@ CXXSRC = WMath.cpp WString.cpp Print.cpp Marlin_main.cpp	\
 	SdFile.cpp SdVolume.cpp motion_control.cpp planner.cpp		\
 	stepper.cpp temperature.cpp cardreader.cpp ConfigurationStore.cpp \
 	watchdog.cpp SPI.cpp Servo.cpp Tone.cpp ultralcd.cpp digipot_mcp4451.cpp \
-	vector_3.cpp qr_solve.cpp memreader.cpp Hysteresis.cpp
+	vector_3.cpp qr_solve.cpp memreader.cpp Hysteresis.cpp lifetime_stats.cpp
 ifeq ($(LIQUID_TWI2), 0)
 ifeq ($(LANGUAGE_CHOICE), 6)
 CXXSRC += LiquidCrystalRus.cpp
