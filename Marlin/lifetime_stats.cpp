@@ -113,6 +113,7 @@ static void load_lifetime_stats()
         triptime_minutes = 0;
         triptime_print_minutes = 0;
         triptime_print_centimeters = 0;
+        save_lifetime_stats();
     }
 }
 
@@ -150,4 +151,5 @@ void reset_triptime()
     triptime_minutes = 0;
     triptime_print_minutes = 0;
     triptime_print_centimeters = 0;
+    save_lifetime_stats();
 }

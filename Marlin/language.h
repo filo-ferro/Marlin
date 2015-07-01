@@ -301,6 +301,13 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
+	#define MSG_STATSMENU          "Stats"
+	#define MSG_STATSMENU_LIFETIME "Lifetime"
+	#define MSG_STATSMENU_TRIPTIME "Triptime"
+	#define MSG_STATSMENU_RESET    "Reset triptime"
+	#define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
 #endif
 
 
@@ -937,6 +944,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
+	#define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 
@@ -1363,6 +1378,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
+	#define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 #if LANGUAGE_CHOICE == 7
@@ -1578,6 +1601,13 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Qualcosa non va in MenuStructure."
 
+        #define MSG_STATSMENU          "Statistiche"
+	#define MSG_STATSMENU_LIFETIME "Totali"
+        #define MSG_STATSMENU_TRIPTIME "Parziali"
+        #define MSG_STATSMENU_RESET    "Reset parziali"
+        #define MSG_STATS_LIFETIME     "Accesa:"
+        #define MSG_STATS_PRINTTIME    "In stampa:"
+        #define MSG_STATS_FILAMENT     "Filamento:"
 #endif
 
 

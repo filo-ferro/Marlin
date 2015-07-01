@@ -9,6 +9,7 @@
 #include "stepper.h"
 #include "ConfigurationStore.h"
 #include "planner.h"
+#include "lifetime_stats.h"
 
 int8_t encoderDiff; /* encoderDiff is updated from interrupt context and added to encoderPosition every LCD update */
 
@@ -71,6 +72,7 @@ static void lcd_set_contrast();
 static void lcd_control_retract_menu();
 static void lcd_sdcard_menu();
 static void lcd_sdprint_settings();
+static void lcd_stats_menu();
 
 static void lcd_quick_feedback();//Cause an LCD refresh, and give the user visual or audible feedback that something has happened
 
@@ -283,6 +285,67 @@ static void lcd_sdcard_stop()
     cancel_heatup = true;
 }
 
+static void print_lifetime_row( unsigned long int i, int row )
+{
+    lcd.setCursor(0, 1+row);
+    if ( row == 0 )
+        lcd_printPGM(PSTR(MSG_STATS_LIFETIME));
+    else
+        lcd_printPGM(PSTR(MSG_STATS_PRINTTIME));
+    lcd.setCursor(10, 1+row);
+    lcd.print( itostr4(i/1440) );
+    i = i%1440;
+    lcd_printPGM(PSTR(":" ));
+    lcd.print( itostr2(i/60) );
+    i = i%60;
+    lcd_printPGM(PSTR(":" ));
+    lcd.print( itostr2(i) );
+}
+
+static void lcd_lifetime_stats()
+{
+    unsigned long int i;
+    START_MENU();
+    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+    print_lifetime_row( lifetime_minutes, 0 );
+    print_lifetime_row( lifetime_print_minutes, 1 );
+
+    i = lifetime_print_centimeters;
+    lcd.setCursor(0, 3);
+    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+    lcd.setCursor(12, 3);
+    lcd.print( ftostr5((float)i/100.0) );
+    lcd_printPGM(PSTR(" m"));
+    END_MENU();
+}
+
+static void lcd_triptime_stats()
+{
+    unsigned long int i;
+    START_MENU();
+    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+    print_lifetime_row( triptime_minutes, 0 );
+    print_lifetime_row( triptime_print_minutes, 1 );
+
+    i = triptime_print_centimeters;
+    lcd.setCursor(0, 3);
+    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+    lcd.setCursor(12, 3);
+    lcd.print( ftostr5((float)i/100.0) );
+    lcd_printPGM(PSTR(" m"));
+    END_MENU();
+}
+
+static void lcd_stats_menu()
+{
+    START_MENU();
+    MENU_ITEM(back, MSG_WATCH, lcd_main_menu);
+    MENU_ITEM(submenu, MSG_STATSMENU_LIFETIME, lcd_lifetime_stats);
+    MENU_ITEM(submenu, MSG_STATSMENU_TRIPTIME, lcd_triptime_stats);
+    MENU_ITEM(function, MSG_STATSMENU_RESET, reset_triptime );
+    END_MENU();
+}
+
 /* Menu implementation */
 static void lcd_main_menu()
 {
@@ -319,6 +382,7 @@ static void lcd_main_menu()
     }
 #endif
     MENU_ITEM(function, "Reset", lcdReset);
+    MENU_ITEM(submenu, MSG_STATSMENU, lcd_stats_menu);
     END_MENU();
 }
 
