@@ -743,7 +743,7 @@
 // LCD Menu Messages
 // Please note these are limited to 17 characters!
 
-	#define WELCOME_MSG MACHINE_NAME " Bereit."
+	#define WELCOME_MSG MACHINE_NAME
 
 	#define MSG_SD_INSERTED      "SDKarte erkannt"
 	#define MSG_SD_REMOVED       "SDKarte entfernt"
@@ -951,7 +951,17 @@
         #define MSG_STATS_LIFETIME     "Power On:"
         #define MSG_STATS_PRINTTIME    "Printing:"
         #define MSG_STATS_FILAMENT     "Filament:"
-
+        #define MSG_HOURS              "Hours"
+        #define MSG_MINUTES            "Minutes"
+        #define MSG_CHANGE_RIGHT       "Change Right Fil."
+        #define MSG_CHANGE_LEFT        "Change Left Fil. "
+        #define MSG_CHANGE_SINGLE      "Change Filament  "
+        #define MSG_LOAD_SINGLE        "Charge Filament  "
+        #define MSG_PRINT_GCODE        "Use GCode params "
+        #define MSG_FILAMENT_DETECTION "Check filament "
+        #define MSG_PLATE_LEVEL_A      "Test plate"
+        #define MSG_PLATE_LEVEL_M      "Level plate Man. "
+        #define MSG_MOVEDOWN           "Move plate down  "
 #endif
 
 

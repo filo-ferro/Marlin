@@ -40,6 +40,41 @@
 #include "sc_level_plate_m_en.h"
 #endif
 
+#elif LANGUAGE_CHOICE == 4
+   // German
+   #ifndef SC_LEVEL_PLATE_A
+   #include "sc_level_plate_a_ge.h"
+   #endif
+
+   #ifndef SC_LEVEL_PLATE_M
+   #include "sc_level_plate_m_ge.h"
+   #endif
+
+   #ifndef SC_CHANGE_LEFT
+   #include "sc_change_left_ge.h"
+   #endif
+
+   #ifndef SC_CHANGE_RIGHT
+   #include "sc_change_right_ge.h"
+   #endif
+#elif LANGUAGE_CHOICE == 5
+   // Spanish
+   #ifndef SC_LEVEL_PLATE_A
+   #include "sc_level_plate_a_es.h"
+   #endif
+
+   #ifndef SC_LEVEL_PLATE_M
+   #include "sc_level_plate_m_es.h"
+   #endif
+
+   #ifndef SC_CHANGE_LEFT
+   #include "sc_change_left_es.h"
+   #endif
+
+   #ifndef SC_CHANGE_RIGHT
+   #include "sc_change_right_es.h"
+   #endif
+
 #else
 // Any other language
 #include "sc_level_plate_a.h"
