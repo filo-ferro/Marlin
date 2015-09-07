@@ -7,6 +7,8 @@ extern unsigned long lifetime_print_centimeters;
 extern unsigned long triptime_minutes;
 extern unsigned long triptime_print_minutes;
 extern unsigned long triptime_print_centimeters;
+extern unsigned long last_print_minutes;
+extern unsigned long last_print_centimeters;
 
 void lifetime_stats_init();
 void lifetime_stats_tick();

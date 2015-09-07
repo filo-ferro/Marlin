@@ -336,12 +336,29 @@ static void lcd_triptime_stats()
     END_MENU();
 }
 
+static void lcd_lastprint_stats()
+{
+    unsigned long int i;
+    START_MENU();
+    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+    print_lifetime_row( last_print_minutes, 1 );
+
+    i = last_print_centimeters;
+    lcd.setCursor(0, 3);
+    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+    lcd.setCursor(12, 3);
+    lcd.print( ftostr5((float)i/100.0) );
+    lcd_printPGM(PSTR(" m"));
+    END_MENU();
+}
+
 static void lcd_stats_menu()
 {
     START_MENU();
     MENU_ITEM(back, MSG_WATCH, lcd_main_menu);
     MENU_ITEM(submenu, MSG_STATSMENU_LIFETIME, lcd_lifetime_stats);
     MENU_ITEM(submenu, MSG_STATSMENU_TRIPTIME, lcd_triptime_stats);
+    MENU_ITEM(submenu, MSG_STATSMENU_LAST, lcd_lastprint_stats);
     MENU_ITEM(function, MSG_STATSMENU_RESET, reset_triptime );
     END_MENU();
 }
