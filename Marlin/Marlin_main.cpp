@@ -3901,29 +3901,6 @@ void get_coordinates()
     else destination[i] = current_position[i]; //Are these else lines really needed?
   }
 
-#ifdef USE_FILAMENT_DETECTION
-  //SERIAL_ECHO_START;
-  //SERIAL_ECHOPGM("Check FILAMENT:");
-  //SERIAL_ECHOLN(buflen);
-
-  static int cmd = 0;
-
-  if ( detect_filament && ( destination[E_AXIS] > current_position[E_AXIS] ) && ( buflen == (BUFSIZE-1) ) ) {
-     // X_MAX_PIN -> 36
-     if ( cmd > 5 ) {
-       if ( ( READ(X_MIN_PIN)==0 ) && ( forced_M600 == false ) ) {
-          SERIAL_ECHO_START;
-          SERIAL_ECHOLNPGM("No FILAMENT");
-          forced_M600 = true;
-       }
-       cmd = 0;
-    }
-    cmd++;
-  } else {
-    cmd = 0;
-  }
-#endif
-
   if(code_seen('F')) {
     next_feedrate = code_value();
     if(next_feedrate > 0.0) feedrate = next_feedrate;
