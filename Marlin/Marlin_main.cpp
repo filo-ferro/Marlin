@@ -3320,6 +3320,10 @@ void process_commands()
 	#ifdef USE_FILAMENT_DETECTION
         bool old_detect_filament = detect_filament;
         detect_filament = false;
+        if ( forced_M600 == true ) {
+            SERIAL_ECHO_START;
+            SERIAL_ECHOLNPGM("EVENT_FORCED_M600");
+        }
 	#endif
         float target[4];
         float lastpos[4];
