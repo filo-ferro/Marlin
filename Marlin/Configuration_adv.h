@@ -183,7 +183,8 @@
 //#endif
 
 #if defined (Z_DUAL_STEPPER_DRIVERS) || defined (Y_DUAL_STEPPER_DRIVERS)
-  #define AUTOHOME_DUAL_TIMEOUT 10000
+  #define AUTOHOME_DUAL_TIMEOUT 10000 // timeout (ms) between different endstop hit on dual stepper axis homing
+  #define DUAL_AXIS_MIN_LEVELING 0.1 // minimum movement (mm) while leveling dual stepper axis
 #endif
 
 // Enable this for dual x-carriage printers. 
