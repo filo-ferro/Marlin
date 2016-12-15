@@ -1225,7 +1225,7 @@ static void clean_up_after_endstop_move() {
 #ifdef ENDSTOPS_ONLY_FOR_HOMING
     enable_endstops(false);
 #endif
-
+    endstops_hit_on_purpose();
     feedrate = saved_feedrate;
     feedmultiply = saved_feedmultiply;
     previous_millis_cmd = millis();
