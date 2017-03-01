@@ -233,9 +233,9 @@
 //    #define  DEFAULT_Kd 12
 
 // Mendel Parts V9 on 12V
-    #define  DEFAULT_Kp 20.47 //old: 12.56
-    #define  DEFAULT_Ki 1.35  //old: 0.57
-    #define  DEFAULT_Kd 77.46 //old: 68.76
+    #define  DEFAULT_Kp 16.54 //old: 12.56
+    #define  DEFAULT_Ki 0.81  //old: 0.57
+    #define  DEFAULT_Kd 84.53 //old: 68.76
 #endif // PIDTEMP
 
 // Bed Temperature Control

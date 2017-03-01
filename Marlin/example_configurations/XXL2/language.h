@@ -49,7 +49,7 @@
 	#endif
 #elif MOTHERBOARD == 80 || MOTHERBOARD == 80
 	#ifndef MACHINE_NAME
-		#define MACHINE_NAME "SHAREBOT XXL2"
+		#define MACHINE_NAME "SHAREBOT XXL+"
 		#define FIRMWARE_URL "http://www.sharebot.it"
 	#endif
 #elif MOTHERBOARD == 7 || MOTHERBOARD == 71
