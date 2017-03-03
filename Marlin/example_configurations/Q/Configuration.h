@@ -196,7 +196,7 @@
 #define HEATER_0_MAXTEMP 290
 #define HEATER_1_MAXTEMP 290
 #define HEATER_2_MAXTEMP 290
-#define BED_MAXTEMP 140
+#define BED_MAXTEMP 150
 
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
 // average current. The value should be an integer and the heat bed will be turned on for 1 interval of
@@ -421,12 +421,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
     // with no grid, just probe 3 arbitrary points.  A simple cross-product
     // is used to esimate the plane of the print bed
 
-      #define ABL_PROBE_PT_1_X 50 //85.3
-      #define ABL_PROBE_PT_1_Y 50
-      #define ABL_PROBE_PT_2_X 250 //285.3
+      #define ABL_PROBE_PT_1_X 250 
+      #define ABL_PROBE_PT_1_Y 380
+      #define ABL_PROBE_PT_2_X 50 
       #define ABL_PROBE_PT_2_Y 200
-      #define ABL_PROBE_PT_3_X 50 //85.3
-      #define ABL_PROBE_PT_3_Y 380
+      #define ABL_PROBE_PT_3_X 250 
+      #define ABL_PROBE_PT_3_Y 50
 
   #endif // AUTO_BED_LEVELING_GRID
 
@@ -573,7 +573,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define CUSTOM_M_CODES
 #ifdef CUSTOM_M_CODES
   #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
-  #define Z_PROBE_OFFSET_RANGE_MIN -5 // -15
+  #define Z_PROBE_OFFSET_RANGE_MIN -10 // -15
   #define Z_PROBE_OFFSET_RANGE_MAX 20 // -5
 #endif
 
